@@ -1,0 +1,21 @@
+GIGABAJT CMR — SAMODZIELNY ANDROID APK (PROJEKT TESTOWY)
+
+Źródło: oryginalna paczka GB CMR 12.6, bez zmiany istniejących funkcji HTML (dodana obsługa przekazania pobieranych plików Androidowi).
+
+1. Wgraj do NOWEGO repozytorium GitHub CAŁĄ ZAWARTOŚĆ tej paczki, zachowując katalogi app/ i .github/.
+   Nie wgrywaj do głównego istniejącego repo GB CMR, bo zawiera projekt strony GitHub Pages.
+2. GitHub -> Actions -> Zbuduj GB CMR APK -> Run workflow.
+3. Po udanym buildzie: Actions -> run -> Artifacts -> Gigabajt-CMR-Android-12-6-debug.
+4. Pobierz archiwum artefaktu, rozpakuj i uruchom app-debug.apk na Androidzie.
+
+Uwaga: debug APK ma automatyczny testowy podpis; instalowanie kolejnych buildów z innym podpisem może wymagać odinstalowania. Zachowaj ważne dane przed zmianą.
+
+Implementacja:
+- index.html i kalendarz w APK; start bez strony GitHub Pages
+- Native Android WebViewAssetLoader (bez zewnętrznej przeglądarki)
+- Pliki PDF, JSON oraz obrazy eksportowane z blob: do folderu Pobrane/Gigabajt-CMR
+- Native drukowanie PDF przez Android PrintManager
+- Androidowy wybór plików oraz prośba o GPS
+- zdjęcia z wejścia file picker wymagają sprawdzenia na konkretnym telefonie
+
+Nie był wykonany pełny kompilacyjny test GitHub Actions ani test na Androidzie. Najpierw sprawdź zapis PDF, import/eksport, aparat, GPS i działanie bez internetu. Dane aplikacji webowej NIE przeniosą się automatycznie do APK.
