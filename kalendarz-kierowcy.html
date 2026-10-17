@@ -1,34 +1,234 @@
 <!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff"><title>Gigabajt CMR — Kalendarz kierowcy</title>
 <style>
-:root{font-family:system-ui,Arial,sans-serif;color:#17243b;background:white}*{box-sizing:border-box}body{margin:0;padding:6px}button,input{font:inherit}button{cursor:pointer}.nav{border:1px solid #dbe2eb;border-radius:9px;background:white;color:#17243b;padding:8px 12px}.primary{width:100%;border:0;border-radius:10px;background:#202020;color:#fff;padding:12px;font-weight:700}.secondary{width:100%;border:1px solid #dbe2eb;border-radius:10px;background:#fff;color:#17243b;padding:11px;font-weight:650}.panel{padding:12px;border-radius:11px;background:#f3f6fa}.muted{font-size:12px;color:#66768d}.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:9px}.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}.tile{width:100%;min-width:0;height:48px;padding:11px 1px 3px;border:1px solid #dbe2eb;border-radius:8px;background:#fff;color:#17243b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative}.green{background:rgba(40,165,85,.12)}.yellow{background:rgba(245,197,35,.2)}.red{background:rgba(225,65,65,.15)}.hard{background:rgba(225,45,45,.34)!important;border:2px solid #d42323!important}.left,.right{position:absolute;top:2px;color:#2475b8;font-size:9px;font-weight:850;line-height:1}.left{left:2px}.right{right:2px}.bad{color:#d32222!important}.bang{position:absolute;left:2px;bottom:1px;color:#d32222;font-weight:900}.started{position:absolute;right:1px;bottom:1px;color:#2475b8;font-size:8px;font-weight:800}.choice{display:flex;gap:9px;align-items:center;border:1px solid #dbe2eb;border-radius:9px;padding:9px;font-size:13px}.clock{width:100%;min-width:0;background:#fff;color:#17243b;border:1px solid #dbe2eb;border-radius:9px;text-align:center;padding:12px 2px;font-size:21px;outline:none}.clock:focus{border-color:#2475b8}.dt{width:100%;min-width:0;border:1px solid #dbe2eb;border-radius:9px;padding:10px 4px;background:white;color:#17243b}.sumcard{width:100%;display:block;text-align:center;border:1px solid #dbe2eb;border-radius:13px;background:#fff;color:#17243b;padding:20px 12px}.sumvalue{font-size:25px;font-weight:800;margin-top:8px}.detailrow{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #dbe2eb;padding:13px 9px;font-size:13px}.warn{margin-top:8px;padding:8px;color:#c41616;border:1px solid #d4232366;border-radius:8px;font-size:12px}
-</style></head><body><main id="app"></main><script>
+:root{font-family:system-ui,Arial,sans-serif;color:#17243b;background:white}*{box-sizing:border-box}body{margin:0;padding:6px}button,input{font:inherit}button{cursor:pointer}.nav{border:1px solid #dbe2eb;border-radius:9px;background:white;color:#17243b;padding:8px 12px}.primary{width:100%;border:0;border-radius:10px;background:#202020;color:#fff;padding:12px;font-weight:700}.secondary{width:100%;border:1px solid #dbe2eb;border-radius:10px;background:#fff;color:#17243b;padding:11px;font-weight:650}.panel{padding:12px;border-radius:11px;background:#f3f6fa}.muted{font-size:12px;color:#66768d}.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:9px}.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}.tile{width:100%;min-width:0;height:48px;padding:11px 1px 3px;border:1px solid #dbe2eb;border-radius:8px;background:#fff;color:#17243b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative}.green{background:rgba(40,165,85,.12)}.yellow{background:rgba(245,197,35,.2)}.red{background:rgba(225,65,65,.15)}.hard{background:rgba(225,45,45,.34)!important;border:2px solid #d42323!important}.left,.right{position:absolute;top:2px;color:#2475b8;font-size:9px;font-weight:850;line-height:1}.left{left:2px}.right{right:2px}.bad{color:#d32222!important}.bang{position:absolute;left:2px;bottom:1px;color:#d32222;font-weight:900}.nineflag{position:absolute;right:3px;bottom:1px;color:#d32222;font-size:10px;font-weight:900;line-height:1}.started{position:absolute;right:1px;bottom:1px;color:#2475b8;font-size:8px;font-weight:800}.choice{display:flex;gap:9px;align-items:center;border:1px solid #dbe2eb;border-radius:9px;padding:9px;font-size:13px}.clock{width:100%;min-width:0;background:#fff;color:#17243b;border:1px solid #dbe2eb;border-radius:9px;text-align:center;padding:12px 2px;font-size:21px;outline:none}.clock:focus{border-color:#2475b8}.dt{width:100%;min-width:0;border:1px solid #dbe2eb;border-radius:9px;padding:10px 4px;background:white;color:#17243b}.sumcard{width:100%;display:block;text-align:center;border:1px solid #dbe2eb;border-radius:13px;background:#fff;color:#17243b;padding:20px 12px}.sumvalue{font-size:25px;font-weight:800;margin-top:8px}.detailrow{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #dbe2eb;padding:13px 9px;font-size:13px}.warn{margin-top:8px;padding:8px;color:#c41616;border:1px solid #d4232366;border-radius:8px;font-size:12px}
+@media screen{#pdfReport{display:none}}
+@media print{
+ @page{size:A4;margin:12mm}
+ body{margin:0;padding:0;color:#17243b;background:white}
+ #app{display:none!important}
+ #pdfReport{display:block!important;font:11px Arial,sans-serif;line-height:1.4;color:#17243b}
+ #pdfReport h1{font-size:20px;margin:0 0 5px}
+ #pdfReport h2{font-size:15px;margin:16px 0 6px}
+ #pdfReport .pdfmeta{font-size:10px;color:#64748b;margin-bottom:12px}
+ #pdfReport table{width:100%;border-collapse:collapse;font-size:10px}
+ #pdfReport th,#pdfReport td{border:1px solid #aebccc;text-align:left;padding:5px 4px;vertical-align:top}
+ #pdfReport th{background:#e8eff7;font-weight:bold}
+ #pdfReport tr{break-inside:avoid}
+ #pdfReport .pdfstats{display:flex;gap:16px;flex-wrap:wrap;margin:9px 0}
+ #pdfReport .pdfstats span{padding:8px;border:1px solid #cbd5e1;border-radius:5px}
+ #pdfReport .pdfnote{font-size:10px;color:#64748b;margin-top:12px}
+}
+</style></head><body><main id="app"></main><section id="pdfReport" aria-hidden="true"></section><script>
 (()=>{'use strict';
-const V=document.getElementById('app'),P=n=>String(n).padStart(2,'0'),H=3600000,mo=['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'],KEY='gigabajt-cmr-kalendarz-v23';
-let Y=2026,M=9,selected=0,draft=null,db={},anchor='2026-10-12T06:00',ws='2026-10-18T06:00',we='2026-10-19T06:00';
-try{let saved=JSON.parse(localStorage.getItem(KEY)||'null');if(saved&&saved.db){db=saved.db;anchor=saved.anchor||anchor;ws=saved.ws||ws;we=saved.we||we}}catch(e){}
+const V=document.getElementById('app'),P=n=>String(n).padStart(2,'0'),H=3600000,mo=['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'],KEY='gigabajt-cmr-kalendarz-v23-test-v10-directpdf';
+let Y=2026,M=9,selected=0,draft=null,db={},anchor='',ws='',we='';
+try{
+ let saved=JSON.parse(localStorage.getItem(KEY)||'null');
+ if(!saved){
+  // Przenies dane kalendarza, ale NIE przenos starych dat demonstracyjnych ustawien 144 h.
+  let prior=JSON.parse(localStorage.getItem('gigabajt-cmr-kalendarz-v23-test-nightshift-v8-ninecorner')||'null')||JSON.parse(localStorage.getItem('gigabajt-cmr-kalendarz-v23-test-nightshift-v7')||'null')||JSON.parse(localStorage.getItem('gigabajt-cmr-kalendarz-v23-test-shortrest-v5')||'null')||JSON.parse(localStorage.getItem('gigabajt-cmr-kalendarz-v23')||'null');
+  if(prior&&prior.db){db=prior.db;anchor=prior.anchor||'';ws=prior.ws||'';we=prior.we||'';}
+ }else if(saved.db){db=saved.db;anchor=saved.anchor||'';ws=saved.ws||'';we=saved.we||''}
+}catch(e){}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify({db,anchor,ws,we}))}catch(e){}}
-const key=d=>`${Y}-${P(M+1)}-${P(d)}`,dDate=k=>{let a=k.split('-').map(Number);return new Date(a[0],a[1]-1,a[2])},work=r=>r&&(r.type==='work'||r.type==='return'),valid=s=>/^\d{4}$/.test(s||'')&&+s.slice(0,2)<24&&+s.slice(2)<60,dur=s=>/^\d{4}$/.test(s||'')&&+s.slice(2)<60?+s.slice(0,2)*60+ +s.slice(2):null,dt=s=>{let x=s?new Date(s):null;return x&&Number.isFinite(+x)?+x:null},fmt=s=>valid(s)?s.slice(0,2)+':'+s.slice(2):'',human=n=>`${Math.floor(n/60)} godz. ${P(n%60)} min`;
+const key=d=>`${Y}-${P(M+1)}-${P(d)}`,dDate=k=>{let a=k.split('-').map(Number);return new Date(a[0],a[1]-1,a[2])},work=r=>r&&(r.type==='work'||r.type==='return'||r.type==='depart'),valid=s=>/^\d{4}$/.test(s||'')&&+s.slice(0,2)<24&&+s.slice(2)<60,dur=s=>/^\d{4}$/.test(s||'')&&+s.slice(2)<60?+s.slice(0,2)*60+ +s.slice(2):null,dt=s=>{let x=s?new Date(s):null;return x&&Number.isFinite(+x)?+x:null},fmt=s=>valid(s)?s.slice(0,2)+':'+s.slice(2):'',human=n=>`${Math.floor(n/60)} godz. ${P(n%60)} min`;
 const paths={truck:'<rect x="2" y="6" width="13" height="10" rx="1"/><path d="M15 9h4l3 3v4h-7"/><circle cx="6.5" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',home:'<path d="m3 11 9-8 9 8"/><path d="M5 10v11h14V10"/><path d="M9 21v-7h6v7"/>',bed:'<path d="M3 5v16M21 11v10M3 17h18v4M3 11h18v6M7 11V7h9v4"/>'};
-function icon(t,n=16){if(t==='return')return `<span style="display:inline-flex">${icon('truck',12)}${icon('home',12)}</span>`;return `<svg width="${n}" height="${n}" viewBox="0 0 24 24" fill="none" stroke="${t==='truck'?'#2277bc':t==='home'?'#27824d':'#17243b'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths[t]}</svg>`}const sym=t=>t==='work'?'truck':t==='return'?'return':t==='home'?'home':'bed';
-function interval(k,r){if(!work(r)||!valid(r.start))return null;let a=dDate(k);a.setHours(+r.start.slice(0,2),+r.start.slice(2));let b=null;if(valid(r.end)){b=dDate(k);b.setHours(+r.end.slice(0,2),+r.end.slice(2));if(b<=a)b.setDate(b.getDate()+1)}return {a:+a,b:b===null?null:+b}}
+function icon(t,n=16){if(t==='return')return `<span style="display:inline-flex">${icon('truck',12)}${icon('home',12)}</span>`;if(t==='depart')return `<span style="display:inline-flex">${icon('home',12)}${icon('truck',12)}</span>`;return `<svg width="${n}" height="${n}" viewBox="0 0 24 24" fill="none" stroke="${t==='truck'?'#2277bc':t==='home'?'#27824d':'#17243b'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths[t]}</svg>`}const sym=t=>t==='work'?'truck':t==='return'?'return':t==='depart'?'depart':t==='home'?'home':'bed';
+function interval(k,r){if(!work(r)||!valid(r.start))return null;let a=dDate(k);if(r.startOffset===-1)a.setDate(a.getDate()-1);a.setHours(+r.start.slice(0,2),+r.start.slice(2));let b=null;if(valid(r.end)){b=new Date(a);b.setHours(+r.end.slice(0,2),+r.end.slice(2));if(b<=a)b.setDate(b.getDate()+1)}return {a:+a,b:b===null?null:+b}}
 function shifts(){return Object.entries(db).map(([k,r])=>({k,r,p:interval(k,r)})).filter(e=>e.p).map(e=>({...e.p,k:e.k,r:e.r})).sort((a,b)=>a.a-b.a)}
 function week(){let a=dt(ws),b=dt(we);return a!==null&&b!==null&&b-a>=24*H?{a,b}:null}
 function gap(k,r){let p=interval(k,r);if(!p||p.b===null)return null;let n=shifts().find(x=>x.k!==k&&x.a>=p.b);return n?Math.round((n.a-p.b)/60000):null}
-function left(k,r){let p=interval(k,r),w=week();return p&&w&&p.a===w.b?Math.round((w.b-w.a)/60000):null}
-function right(k,r){let p=interval(k,r),d=dDate(k),mid=+new Date(d.getFullYear(),d.getMonth(),d.getDate()+1);if(p){if(p.b===null)return null;if(r.type==='return')return p.b<mid?Math.round((mid-p.b)/60000):null;let g=gap(k,r);return g===null?null:g<=1440?g:p.b<mid?Math.round((mid-p.b)/60000):null}if(!r||!['rest','home'].includes(r.type))return null;let prev=shifts().filter(x=>x.b!==null&&x.b<=+d).at(-1);if(!prev)return null;let next=shifts().find(x=>x.k!==prev.k&&x.a>=prev.b);if(next&&next.a<mid)return null;return Math.round((mid-prev.b)/60000)}
-function alerts(k,r){let p=interval(k,r),out={hard:[],short:false};if(!p||p.b===null)return out;let w=week(),base=dt(anchor),ref=w&&p.a>=w.b?w.b:base,g=gap(k,r);if(w&&p.a<w.b&&p.b>w.a)out.hard.push('Praca nakłada się na odpoczynek tygodniowy.');if(ref!==null&&p.b>ref+144*H&&!(w&&w.a>=ref&&w.a<=ref+144*H&&p.a<=w.a))out.hard.push('Przekroczona granica 144 godzin.');let used=0,es=shifts().filter(x=>x.b!==null);for(let i=0;i<es.length-1;i++){let a=es[i],b=es[i+1],n=(b.a-a.b)/H;if(ref!==null&&a.a>=ref&&a.a<p.a&&n>=9&&n<11&&a.r.three!==true)used++}if(g!==null&&g>=540&&g<660&&r.three!==true&&used>=3)out.hard.push('Czwarty potencjalny skrócony odpoczynek (9–10 h).');out.short=g!==null&&g>=0&&g<540&&r.type!=='return';return out}
-function color(k,r){let p=interval(k,r),a=alerts(k,r);if(a.hard.length)return 'hard';if(!p||p.b===null)return '';let n=(p.b-p.a)/60000;return n>900?'red':n>780?'yellow':'green'}
-function calendar(){let off=(new Date(Y,M,1).getDay()+6)%7,n=new Date(Y,M+1,0).getDate(),cells='';for(let i=0;i<Math.ceil((off+n)/7)*7;i++){let d=i-off+1;if(d<1||d>n){cells+='<span></span>';continue}let k=key(d),r=db[k],a=alerts(k,r),l=left(k,r),rr=right(k,r),p=interval(k,r);cells+=`<button class="tile ${color(k,r)}" data-day="${d}">${l!==null?`<span class="left">${Math.floor(l/60)}h</span>`:''}${r?.three===true&&work(r)?'<span class="right bad">+3</span>':rr!==null&&rr>=60?`<span class="right ${a.short?'bad':''}">${Math.floor(rr/60)}h</span>`:''}${a.hard.length||a.short?'<span class="bang">!</span>':''}<span style="font-size:12px">${d}</span><span style="height:17px">${r?icon(sym(r.type)):''}</span>${p&&p.b===null?'<span class="started">START</span>':''}</button>`}let w=week();V.innerHTML=`<div class="top"><strong style="font-size:20px">Kalendarz kierowcy</strong><span>▦</span></div><div class="top"><button class="nav" id="prev">‹</button><strong>${mo[M]} ${Y}</strong><button class="nav" id="next">›</button></div><div class="grid">${['Pn','Wt','Śr','Cz','Pt','So','Nd'].map(x=>`<span class="muted" style="text-align:center">${x}</span>`).join('')}${cells}</div><div style="display:flex;gap:13px;flex-wrap:wrap;margin:14px 0;font-size:12px"><span>${icon('truck')} Praca</span><span>${icon('bed')} Odpoczynek</span><span>${icon('home')} Dom</span></div><div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:12px"><span><b style="color:#36aa6b">●</b> do 13 h</span><span><b style="color:#dfb51c">●</b> 13–15 h</span><span><b style="color:#d42b2b">●</b> >15 h/alarm</span></div><button class="primary" id="summary">Zestawienie miesiąca</button><div class="panel" style="margin-top:13px"><div class="top" style="margin:0"><strong style="font-size:13px">Odpoczynek tygodniowy i 144 h</strong><button class="nav" id="settings">Ustaw</button></div><p class="muted" style="margin:8px 0 0">${w?'Tygodniowy: '+human(Math.round((w.b-w.a)/60000))+'. Nowy cykl od '+new Date(w.b).toLocaleString('pl-PL'):'Brak wpisanej pauzy tygodniowej'}</p></div>`;V.querySelector('#summary').onclick=summary;V.querySelector('#settings').onclick=settings;V.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>{selected=+b.dataset.day;draft={type:'work',start:'',end:'',drive:'',other:'',three:null,...(db[key(selected)]||{})};details()});for(let [id,z] of [['prev',-1],['next',1]])V.querySelector('#'+id).onclick=()=>{let d=new Date(Y,M+z,1);Y=d.getFullYear();M=d.getMonth();calendar()}}
+function restLink(k,r){let p=interval(k,r);if(!p)return null;let prev=shifts().filter(x=>x.b!==null&&x.b<=p.a&&x.k!==k).at(-1);if(!prev)return null;let between=shifts().some(x=>x.k!==k&&x.k!==prev.k&&x.a>=prev.b&&x.a<p.a);if(between)return null;let minutes=Math.round((p.a-prev.b)/60000);if(minutes<0)return null;let home=prev.r.type==='return';return {minutes,home}}
+// Cumulative rest at home: display on return day, each saved home/rest day,
+// and on the next shift's starting day. Never count work as rest.
+function left(k,r){
+ if(!r)return null;
+ let d=dDate(k),start=+d,end=+new Date(d.getFullYear(),d.getMonth(),d.getDate()+1);
+ let all=shifts(),current=all.find(x=>x.k===k);
+ let cutoff=(current&&current.r.type!=='return')?current.a:end;
+ let lastReturn=all.filter(x=>x.r.type==='return'&&x.b!==null&&x.b<=cutoff).at(-1);
+ if(!lastReturn)return null;
+ // All intervening shifts end the home-rest interval.
+ if(all.some(x=>x.k!==lastReturn.k&&x.a>=lastReturn.b&&x.a<cutoff))return null;
+ if(current&&current.r.type==='return'&&current.k===lastReturn.k){
+   if(lastReturn.b>=end)return null;
+   return Math.round((end-lastReturn.b)/60000);
+ }
+ if(!current&&!['home','rest'].includes(r.type))return null;
+ if(cutoff<=lastReturn.b)return null;
+ return Math.round((cutoff-lastReturn.b)/60000);
+}
+// Przerwa w trasie: liczymy tylko odcinki o potwierdzonym przebiegu.
+// Niezapisane dni są NIEZNANE, nie wolno ich automatycznie przypisać do trasy.
+function roadVerified(from,to){
+ if(to<=from)return false;
+ let d=new Date(from);d.setHours(0,0,0,0);d.setDate(d.getDate()+1);
+ while(+d<to){
+  let k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  // Każdy PEŁNY dzień pomiędzy dniówkami musi być oznaczony jako odpoczynek w trasie.
+  if(+d+24*H<=to && db[k]?.type!=='rest')return false;
+  d.setDate(d.getDate()+1);
+ }
+ return true;
+}
+function right(k,r){
+ let all=shifts().filter(x=>x.b!==null),p=interval(k,r),start=+dDate(k),
+     dayEnd=+new Date(dDate(k).getFullYear(),dDate(k).getMonth(),dDate(k).getDate()+1);
+ if(p){
+  if(p.b===null||r.type==='return')return null;
+  let next=all.find(x=>x.k!==k&&x.a>=p.b);
+  if(next&&roadVerified(p.b,next.a))return Math.round((next.a-p.b)/60000);
+  // Brak rozpoczęcia kolejnej zmiany: odpoczynek PO bieżącej dniówce jest nieznany.
+  // Nie kopiuj tu odpoczynku SPRZED dniówki.
+  return null;
+ }
+ if(!r||r.type!=='rest')return null;
+ let prev=all.filter(x=>x.r.type!=='return'&&x.b<=start).at(-1);
+ if(!prev)return null;
+ if(!roadVerified(prev.b,dayEnd))return null;
+ return Math.round((dayEnd-prev.b)/60000);
+}
+// 144 h: każda pełna pauza tygodniowa (min. 24 h) zamyka poprzedni cykl.
+// Nowy cykl liczymy od KOŃCA tej pauzy, a nie od pierwszej kolejnej jazdy.
+function weeklyPeriods(){
+ let list=[],a=dt(ws),b=dt(we);
+ if(a!==null&&b!==null&&b-a>=24*H&&!shifts().some(x=>x.b!==null&&x.a<b&&x.b>a))list.push({a,b,explicit:true});
+ let ss=shifts().filter(x=>x.b!==null);
+ for(let i=0;i<ss.length-1;i++){
+  let from=ss[i].b,to=ss[i+1].a;
+  if(to-from>=24*H && !ss.some((z,j)=>j!==i&&j!==i+1&&z.a<to&&z.b>from))list.push({a:from,b:to,explicit:false});
+ }
+ list.sort((x,y)=>x.b-y.b);
+ return list;
+}
+function cycleInfo(at){
+ let rests=weeklyPeriods(),initial=dt(anchor),ref=initial;
+ for(let w of rests){if(w.b<=at&&(ref===null||w.b>ref))ref=w.b}
+ return {ref,deadline:ref===null?null:ref+144*H,rests};
+}
+// W 24 godzinach od rozpoczęcia zmiany należy zmieścić odpoczynek dobowy.
+// >13 h bez prawidłowego 3+9 nie zostawia miejsca na pełne 11 h.
+// Ostrzeżenie dla trwającego / brakującego odpoczynku ma charakter warunkowy.
+function nineCandidate(x){
+ if(!x||x.b===null)return false;
+ let dur=(x.b-x.a)/H, gapAfter=gap(x.k,x.r);
+ if(dur>13 && dur<=15 && x.r.three!==true)return true;
+ if(gapAfter!==null && gapAfter>=540 && gapAfter<660 && x.r.three!==true)return true;
+ return false;
+}
+function alerts(k,r){
+ let p=interval(k,r),out={hard:[],short:false,nineUsed:0,nineLimit:false,nineCurrent:false,nineRemaining:null,unknownCycle:false};
+ if(!p||p.b===null)return out;
+ let {ref,deadline,rests}=cycleInfo(p.a),g=gap(k,r),duration=(p.b-p.a)/H;
+ if(rests.some(w=>p.a<w.b&&p.b>w.a))out.hard.push('Praca nakłada się na odpoczynek tygodniowy.');
+ let breach=false;
+ if(deadline!==null){
+  let current=ref;
+  for(let w of rests.filter(w=>w.a>=ref&&w.a<p.b).sort((a,b)=>a.a-b.a)){
+   if(w.a>current+144*H)breach=true;
+   current=w.b;
+  }
+  if(p.b>current+144*H)breach=true;
+ }
+ if(breach)out.hard.push('Przekroczona granica 144 godzin.');
+ let ss=shifts().filter(x=>x.b!==null);
+ let prior=ss.filter(x=>x.a<p.a&&(ref===null || x.a>=ref));
+ out.nineUsed=prior.filter(nineCandidate).length;
+ out.unknownCycle=(ref===null);
+ out.nineCurrent=nineCandidate({k,r,a:p.a,b:p.b});
+ out.nineRemaining=Math.max(0,3-out.nineUsed-(out.nineCurrent?1:0));
+ out.nineLimit=out.nineUsed>=3;
+ if(out.nineCurrent&&out.nineLimit)out.hard.push('Czwarta skrócona pauza dobowa — trzy dziewiątki już wykorzystane.');
+ if(duration>15&&r.three!==true)out.hard.push('Dniówka ponad 15 godzin: nie da się zmieścić 9 godzin odpoczynku w okresie 24 h.');
+ if(g!==null&&g<540&&r.type!=='return'&&r.type!=='depart')out.hard.push('Odpoczynek pomiędzy zmianami krótszy niż 9 godzin.');
+ out.short=g!==null&&g>=0&&g<540&&r.type!=='return'&&r.type!=='depart';
+ return out;
+}
+function color(k,r){
+ let p=interval(k,r),a=alerts(k,r);
+ if(a.hard.length)return 'hard';
+ if(!p||p.b===null)return '';
+ if(a.nineCurrent)return 'yellow';
+ let n=(p.b-p.a)/60000;
+ return n>900?'red':n>780?'yellow':'green';
+}
+function calendar(){let off=(new Date(Y,M,1).getDay()+6)%7,n=new Date(Y,M+1,0).getDate(),cells='';for(let i=0;i<Math.ceil((off+n)/7)*7;i++){let d=i-off+1;if(d<1||d>n){cells+='<span></span>';continue}let k=key(d),r=db[k],a=alerts(k,r),l=left(k,r),rr=right(k,r),p=interval(k,r);cells+=`<button class="tile ${color(k,r)}" data-day="${d}">${l!==null?`<span class="left">${Math.floor(l/60)}h</span>`:''}${rr!==null&&rr>=60?`<span class="right ${a.short?'bad':''}">${Math.floor(rr/60)}h</span>`:''}${a.hard.length||a.short?'<span class="bang">!</span>':''}<span style="font-size:12px">${d}</span><span style="height:17px">${r?icon(sym(r.type)):''}</span>${a.nineCurrent?'<span class="nineflag">9</span>':''}${p&&p.b===null?'<span class="started">START</span>':''}</button>`}let w=week(),last=shifts().at(-1),cycle=cycleInfo(last?(last.b||last.a):Date.now());V.innerHTML=`<div class="top"><strong style="font-size:20px">Kalendarz kierowcy</strong><span>▦</span></div><div class="top"><button class="nav" id="prev">‹</button><strong>${mo[M]} ${Y}</strong><button class="nav" id="next">›</button></div><div class="grid">${['Pn','Wt','Śr','Cz','Pt','So','Nd'].map(x=>`<span class="muted" style="text-align:center">${x}</span>`).join('')}${cells}</div><div style="display:flex;gap:13px;flex-wrap:wrap;margin:14px 0;font-size:12px"><span>${icon('truck')} Praca</span><span>${icon('bed')} Odpoczynek</span><span>${icon('home')} Dom</span></div><div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:12px"><span><b style="color:#36aa6b">●</b> do 13 h</span><span><b style="color:#dfb51c">●</b> 13–15 h</span><span><b style="color:#d42b2b">●</b> >15 h/alarm</span></div><button class="primary" id="summary">Zestawienie miesiąca</button><div class="panel" style="margin-top:13px"><div class="top" style="margin:0"><strong style="font-size:13px">Odpoczynek tygodniowy i 144 h</strong><button class="nav" id="settings">Ustaw</button></div><p class="muted" style="margin:8px 0 0">${cycle.ref!==null?'Cykl 144 h od '+new Date(cycle.ref).toLocaleString('pl-PL')+'. Kolejny odpoczynek tygodniowy zacznij do '+new Date(cycle.deadline).toLocaleString('pl-PL'):'Nie ustalono jeszcze początku cyklu 144 h. Kalendarz wyznaczy go z zapisanych odpoczynków tygodniowych. Jeśli nie ma wcześniejszych wpisów, ustaw datę zakończenia poprzedniego odpoczynku.'}</p></div>`;V.querySelector('#summary').onclick=summary;V.querySelector('#settings').onclick=settings;V.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>{selected=+b.dataset.day;draft={type:'work',start:'',end:'',drive:'',other:'',three:null,...(db[key(selected)]||{})};details()});for(let [id,z] of [['prev',-1],['next',1]])V.querySelector('#'+id).onclick=()=>{let d=new Date(Y,M+z,1);Y=d.getFullYear();M=d.getMonth();calendar()}}
 const categories=[['days','Ukończone dniówki'],['total','Łączny czas dniówek'],['drive','Czas prowadzenia pojazdu'],['other','Czas innej pracy']];
 function monthly(){let a=[];for(let d=1;d<=new Date(Y,M+1,0).getDate();d++){let k=key(d),r=db[k];if(!r)continue;let p=interval(k,r);a.push({d,r,span:p&&p.b!==null?Math.round((p.b-p.a)/60000):null,drive:dur(r.drive),other:dur(r.other)})}return a}
 function sums(){let rows=monthly();return {days:rows.filter(x=>x.span!==null).length,total:rows.reduce((s,x)=>s+(x.span||0),0),drive:rows.reduce((s,x)=>s+(x.drive||0),0),other:rows.reduce((s,x)=>s+(x.other||0),0)}}
-function summary(){let a=sums(),values=[String(a.days),human(a.total),human(a.drive),human(a.other)];V.innerHTML=`<button class="nav" id="back">← Kalendarz</button><h3 style="margin:17px 0">Zestawienie — ${mo[M]} ${Y}</h3><div style="display:grid;gap:10px">${categories.map(([id,name],i)=>`<button class="sumcard" data-cat="${id}"><div class="muted" style="font-size:14px">${name}</div><div class="sumvalue">${values[i]}</div><div class="muted" style="margin-top:8px">Dotknij, aby zobaczyć daty ›</div></button>`).join('')}</div><button class="primary" id="return" style="margin-top:15px">Wróć do kalendarza</button>`;V.querySelector('#back').onclick=calendar;V.querySelector('#return').onclick=calendar;V.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>detailCat(b.dataset.cat))}
+function pdfEscape(v){return String(v===null||v===undefined?'—':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function pdfTime(n){return n===null?'—':human(n)}
+// PDF tworzony lokalnie z obrazów stron A4; polskie znaki rysuje systemowa czcionka Canvas.
+// Nie potrzebuje internetu, window.print() ani zewnętrznej biblioteki.
+function makeDirectPDF(pages){
+ let objects=[],enc=new TextEncoder();
+ const obj=(txt)=>{objects.push(txt);return objects.length};
+ const catalog=obj(''),pagesId=obj('');let pageIds=[];
+ const bytesFromBase64=(b64)=>{let raw=atob(b64),b=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)b[i]=raw.charCodeAt(i);return b};
+ for(let j=0;j<pages.length;j++){
+  const img=bytesFromBase64(pages[j].split(',')[1]);
+  const imageId=obj({img});
+  const stream='q 595 0 0 842 0 0 cm /Im0 Do Q';
+  const contentId=obj({text:enc.encode(stream)});
+  const pageId=obj(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 595 842] /Resources << /XObject << /Im0 ${imageId} 0 R >> >> /Contents ${contentId} 0 R >>`);
+  pageIds.push(pageId);
+ }
+ objects[catalog-1]=`<< /Type /Catalog /Pages ${pagesId} 0 R >>`;
+ objects[pagesId-1]=`<< /Type /Pages /Kids [${pageIds.map(id=>id+' 0 R').join(' ')}] /Count ${pageIds.length} >>`;
+ let chunks=[],offset=0,positions=[0];
+ const append=b=>{chunks.push(b);offset+=b.length};
+ append(enc.encode('%PDF-1.4\n'));
+ for(let i=0;i<objects.length;i++){
+  positions.push(offset);append(enc.encode(`${i+1} 0 obj\n`));let o=objects[i];
+  if(typeof o==='string')append(enc.encode(o+'\n'));
+  else if(o.img){append(enc.encode(`<< /Type /XObject /Subtype /Image /Width 1240 /Height 1754 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${o.img.length} >>\nstream\n`));append(o.img);append(enc.encode('\nendstream\n'))}
+  else{append(enc.encode(`<< /Length ${o.text.length} >>\nstream\n`));append(o.text);append(enc.encode('\nendstream\n'))}
+  append(enc.encode('endobj\n'));
+ }
+ const xref=offset;
+ append(enc.encode(`xref\n0 ${objects.length+1}\n0000000000 65535 f \n`));
+ for(let i=1;i<positions.length;i++)append(enc.encode(String(positions[i]).padStart(10,'0')+' 00000 n \n'));
+ append(enc.encode(`trailer\n<< /Size ${objects.length+1} /Root ${catalog} 0 R >>\nstartxref\n${xref}\n%%EOF`));
+ return new Blob(chunks,{type:'application/pdf'});
+}
+function exportMonthPDF(){
+ const W=1240,Hh=1754,margin=62,line=36;let images=[],canvas,ctx,y=0;
+ const newPage=()=>{if(canvas)images.push(canvas.toDataURL('image/jpeg',0.86));canvas=document.createElement('canvas');canvas.width=W;canvas.height=Hh;ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,Hh);ctx.fillStyle='#17243b';ctx.textBaseline='top';y=margin};
+ const text=(t,x,ypos,font='24px Arial',col='#17243b')=>{ctx.font=font;ctx.fillStyle=col;ctx.fillText(String(t),x,ypos)};
+ const safeLine=()=>{if(y>Hh-135)newPage()};
+ const rule=()=>{ctx.strokeStyle='#ccd6e2';ctx.beginPath();ctx.moveTo(margin,y+28);ctx.lineTo(W-margin,y+28);ctx.stroke();y+=43};
+ newPage();
+ text('Gigabajt CMR — Zestawienie miesiąca',margin,y,'bold 38px Arial');y+=56;
+ text(`${mo[M]} ${Y}    •    ${new Date().toLocaleDateString('pl-PL')}`,margin,y,'24px Arial','#64748b');y+=60;
+ const t=sums(),completed=monthly().filter(x=>x.span!==null).length;
+ const stats=[['Liczba dni z zakończoną dniówką',completed],['Łączny czas zmian',human(t.total)],['Czas jazdy (wpisany)',human(t.drive)],['Czas innej pracy (wpisana)',human(t.other)]];
+ for(let [label,val] of stats){text(label,margin,y,'24px Arial');text(val,W-400,y,'bold 24px Arial');y+=41}y+=35;
+ text('Zapisane dni',margin,y,'bold 31px Arial');y+=47;rule();
+ const whole=Object.entries(db).filter(([k])=>k.startsWith(`${Y}-${P(M+1)}-`)).sort((a,b)=>a[0].localeCompare(b[0]));
+ for(let [k,r] of whole){safeLine();let p=interval(k,r),a=alerts(k,r),inside=right(k,r),home=left(k,r);
+  const typ={'work':'Praca','return':'Powrót do domu','depart':'Wyjazd z domu','home':'W domu','rest':'Odpoczynek poza domem'}[r.type]||r.type;
+  text(`${k} — ${typ}`,margin,y,'bold 23px Arial');
+  if(a.nineCurrent)text('9',W-100,y,'bold 27px Arial','#ce2222');y+=33;
+  const begin=p?new Date(p.a).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+  const finish=p&&p.b!==null?new Date(p.b).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit'}):'—';
+  const duty=p&&p.b!==null?human(Math.round((p.b-p.a)/60000)):'—';
+  text(`Zmiana: ${begin} → ${finish}     Czas: ${duty}`,margin+8,y,'21px Arial');y+=30;
+  text(`Dom: ${home===null?'—':human(home)}   Trasa: ${inside===null?'—':human(inside)}   Jazda: ${r.drive&&dur(r.drive)!==null?human(dur(r.drive)):'—'}   Inna praca: ${r.other&&dur(r.other)!==null?human(dur(r.other)):'—'}`,margin+8,y,'19px Arial','#46556a');y+=35;rule();
+ }
+ safeLine();text('Raport opiera się na zapisanych danych. Nie zastępuje tachografu.',margin,y,'18px Arial','#64748b');
+ images.push(canvas.toDataURL('image/jpeg',0.86));
+ const blob=makeDirectPDF(images),url=URL.createObjectURL(blob),link=document.createElement('a');
+ link.href=url;link.download=`Gigabajt_CMR_Kalendarz_${Y}_${P(M+1)}.pdf`;
+ document.body.appendChild(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+function summary(){let a=sums(),values=[String(a.days),human(a.total),human(a.drive),human(a.other)];V.innerHTML=`<button class="nav" id="back">← Kalendarz</button><h3 style="margin:17px 0">Zestawienie — ${mo[M]} ${Y}</h3><div style="display:grid;gap:10px">${categories.map(([id,name],i)=>`<button class="sumcard" data-cat="${id}"><div class="muted" style="font-size:14px">${name}</div><div class="sumvalue">${values[i]}</div><div class="muted" style="margin-top:8px">Dotknij, aby zobaczyć daty ›</div></button>`).join('')}</div><button class="primary" id="pdfDownload" style="margin-top:15px;background:#226cb7">Pobierz raport PDF</button><button class="primary" id="return" style="margin-top:9px">Wróć do kalendarza</button>`;V.querySelector('#back').onclick=calendar;V.querySelector('#return').onclick=calendar;V.querySelector('#pdfDownload').onclick=exportMonthPDF;V.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>detailCat(b.dataset.cat))}
 function detailCat(id){let name=categories.find(x=>x[0]===id)?.[1];if(!name)return summary();let list=monthly().filter(x=>id==='days'||id==='total'?x.span!==null:x[id]!==null),a=sums(),value=id==='days'?String(a.days):human(a[id]);V.innerHTML=`<button class="nav" id="back">← Zestawienie miesiąca</button><h3>${name}</h3><div class="panel" style="text-align:center;margin-bottom:12px"><div class="muted">${mo[M]} ${Y}</div><div class="sumvalue">${value}</div></div><div class="panel" style="padding:3px 10px">${list.length?list.map(x=>`<div class="detailrow"><div><strong>${x.d} ${mo[M].toLowerCase()}</strong>${id==='days'||id==='total'?`<div class="muted">${fmt(x.r.start)}–${fmt(x.r.end)}</div>`:''}</div><b>${id==='days'?'1 dniówka':human(x[id==='total'?'span':id])}</b></div>`).join(''):'<p class="muted">Nie ma jeszcze wpisów.</p>'}</div><button class="primary" id="return" style="margin-top:14px">Wróć do czterech kafelków</button>`;V.querySelector('#back').onclick=summary;V.querySelector('#return').onclick=summary}
 function mask(inp,initial,callback,duration=false){let chars=String(initial||'').replace(/\D/g,'').slice(0,4).padEnd(4,'_').split(''),pos=0;function caret(){let p=pos>=2?pos+1:pos;try{inp.setSelectionRange(p,p)}catch(e){}}function paint(){inp.value=chars.slice(0,2).join('')+':'+chars.slice(2).join('');callback(chars.includes('_')?'':chars.join(''))}function add(s){for(let c of String(s).replace(/\D/g,'')){if(pos>=4)break;if(!duration&&pos===0&&+c>2)continue;if(!duration&&pos===1&&chars[0]==='2'&&+c>3)continue;if(pos===2&&+c>5)continue;chars[pos++]=c}paint();caret()}inp.addEventListener('focus',()=>{pos=0;requestAnimationFrame(caret)});inp.addEventListener('click',()=>{let p=inp.selectionStart||0;pos=Math.max(0,Math.min(4,p>2?p-1:p));requestAnimationFrame(caret)});inp.addEventListener('beforeinput',e=>{if(e.inputType==='insertText'&&e.data!=null){e.preventDefault();add(e.data)}else if(['deleteContentBackward','deleteContentForward'].includes(e.inputType)){e.preventDefault();if(e.inputType==='deleteContentBackward')pos=Math.max(0,pos-1);if(pos<4)chars[pos]='_';paint();caret()}else if(e.inputType==='insertFromPaste'){e.preventDefault();add(e.dataTransfer?.getData('text')||'')}});inp.addEventListener('paste',e=>{e.preventDefault();chars=['_','_','_','_'];pos=0;add(e.clipboardData?.getData('text')||'')});inp.addEventListener('input',()=>{let s=inp.value.replace(/\D/g,'').slice(0,4);chars=s.padEnd(4,'_').split('');pos=s.length;paint();caret()});paint()}
-function details(){let k=key(selected),r=draft,active=work(r),exists=!!db[k];V.innerHTML=`<button class="nav" id="back">← Kalendarz</button><h3>${selected} ${mo[M].toLowerCase()} ${Y}</h3><div style="display:grid;gap:7px">${[['work','Dzień pracy'],['return','Powrót do domu'],['home','Pobyt w domu'],['rest','Odpoczynek tygodniowy poza domem']].map(([t,n])=>`<label class="choice"><input type="radio" name="type" value="${t}" ${r.type===t?'checked':''}>${icon(sym(t))}<span>${n}</span></label>`).join('')}</div>${active?`<div class="panel" style="margin-top:12px"><strong>Godziny dniówki</strong><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><div><label class="muted">Rozpoczęcie</label><input class="clock" id="start" inputmode="numeric"></div><div><label class="muted">Zakończenie</label><input class="clock" id="end" inputmode="numeric"></div></div><div id="calc" style="font-size:13px;margin-top:9px"></div></div><div class="panel" style="margin-top:12px"><strong>Godziny kierowcy</strong><p class="muted">Te pola możesz pozostawić puste.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label class="muted">Czas prowadzenia pojazdu</label><input class="clock" id="drive" inputmode="numeric"></div><div><label class="muted">Czas innej pracy</label><input class="clock" id="other" inputmode="numeric"></div></div></div><p style="font-size:13px">Czy miałeś co najmniej 3 godziny nieprzerwanego odpoczynku?</p><div style="display:flex;gap:16px;font-size:13px"><label><input type="radio" name="three" value="yes" ${r.three===true?'checked':''}> Tak</label><label><input type="radio" name="three" value="no" ${r.three===false?'checked':''}> Nie</label></div><button class="secondary" id="saveStart" style="margin-top:13px">Zapisz rozpoczęcie</button><button class="primary" id="saveEnd" style="margin-top:9px">Zapisz zakończenie</button>`:'<button class="primary" id="saveDay" style="margin-top:13px">Zapisz dzień</button>'}<div class="panel" id="rests" style="margin-top:12px;font-size:13px"></div>${exists?'<button class="secondary" id="delete" style="margin-top:10px;color:#d32222">Usuń wpis z tego dnia</button>':''}<p class="muted" id="error"></p>`;V.querySelector('#back').onclick=calendar;
-function refresh(){let old=db[k];db[k]={...r};let p=interval(k,r),a=alerts(k,r),l=left(k,r),q=right(k,r);if(old)db[k]=old;else delete db[k];V.querySelector('#rests').innerHTML=`<strong>Odpoczynki</strong><p>Tygodniowy przed pracą: <b style="color:#2475b8">${l===null?'—':human(l)}</b></p><p>Po dniówce: <b style="color:${a.short?'#d32222':'#2475b8'}">${q===null?'—':human(q)}</b></p>`;if(active)V.querySelector('#calc').innerHTML=p&&p.b!==null?`Dniówka: <b>${human(Math.round((p.b-p.a)/60000))}</b>${a.short?'<div class="warn">! Przerwa krótsza niż 9 godzin.</div>':''}${a.hard.map(t=>`<div class="warn">! ${t}</div>`).join('')}`:valid(r.start)?'<b style="color:#2475b8">Rozpoczęcie gotowe do zapisu.</b>':'Wpisz godzinę rozpoczęcia.'}
-V.querySelectorAll('[name=type]').forEach(x=>x.onchange=()=>{r.type=x.value;details()});if(active){for(let f of ['start','end','drive','other'])mask(V.querySelector('#'+f),r[f],x=>{r[f]=x;refresh()},f==='drive'||f==='other');V.querySelectorAll('[name=three]').forEach(x=>x.onchange=()=>{r.three=x.value==='yes';refresh()});V.querySelector('#saveStart').onclick=()=>{if(!valid(r.start)){V.querySelector('#error').textContent='Wpisz pełną godzinę rozpoczęcia.';return}db[k]={...r,end:db[k]?.end||''};persist();calendar()};V.querySelector('#saveEnd').onclick=()=>{if(!valid(r.start)||!valid(r.end)){V.querySelector('#error').textContent='Wpisz rozpoczęcie i zakończenie.';return}db[k]={...r};persist();calendar()}}else V.querySelector('#saveDay').onclick=()=>{db[k]={type:r.type};persist();calendar()};if(exists)V.querySelector('#delete').onclick=()=>{delete db[k];persist();calendar()};refresh()}
-function settings(){V.innerHTML=`<button class="nav" id="back">← Kalendarz</button><h3>Odpoczynek tygodniowy</h3>${[['anchor','Koniec poprzedniego tygodniowego',anchor],['ws','Początek odpoczynku',ws],['we','Koniec odpoczynku',we]].map(([id,name,val])=>`<label class="muted">${name}</label><input class="dt" id="${id}" type="datetime-local" value="${val}" style="margin:5px 0 12px">`).join('')}<button class="primary" id="save">Zapisz</button><p class="muted" id="error"></p>`;V.querySelector('#back').onclick=calendar;V.querySelector('#save').onclick=()=>{let a=V.querySelector('#anchor').value,b=V.querySelector('#ws').value,c=V.querySelector('#we').value;if(dt(a)===null||dt(b)===null||dt(c)===null||dt(c)-dt(b)<24*H){V.querySelector('#error').textContent='Minimum 24 godziny odpoczynku tygodniowego.';return}anchor=a;ws=b;we=c;persist();calendar()}}
+function details(){let k=key(selected),r=draft,active=work(r),exists=!!db[k];V.innerHTML=`<button class="nav" id="back">← Kalendarz</button><h3>${selected} ${mo[M].toLowerCase()} ${Y}</h3><div style="display:grid;gap:7px">${[['work','Dzień pracy'],['return','Powrót do domu'],['depart','Wyjazd z domu'],['home','Pobyt w domu'],['rest','Odpoczynek tygodniowy poza domem']].map(([t,n])=>`<label class="choice"><input type="radio" name="type" value="${t}" ${r.type===t?'checked':''}>${icon(sym(t))}<span>${n}</span></label>`).join('')}</div>${active?`<div class="panel" style="margin-top:12px"><strong>Godziny dniówki</strong><label class="muted" style="display:block;margin-top:9px">Data rozpoczęcia zmiany</label><select id="startOffset" style="width:100%;padding:11px;background:white;border:1px solid #d9dee7;border-radius:9px;font:inherit"><option value="0" ${r.startOffset!==-1?'selected':''}>${selected} ${mo[M].toLowerCase()} (dzień kafelka)</option><option value="-1" ${r.startOffset===-1?'selected':''}>Poprzedniego dnia — ${new Date(dDate(k).getTime()-86400000).toLocaleDateString('pl-PL')}</option></select><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><div><label class="muted">Rozpoczęcie</label><input class="clock" id="start" inputmode="numeric"></div><div><label class="muted">Zakończenie</label><input class="clock" id="end" inputmode="numeric"></div></div><div id="calc" style="font-size:13px;margin-top:9px"></div></div><div class="panel" style="margin-top:12px"><strong>Godziny kierowcy</strong><p class="muted">Te pola możesz pozostawić puste.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label class="muted">Czas prowadzenia pojazdu</label><input class="clock" id="drive" inputmode="numeric"></div><div><label class="muted">Czas innej pracy</label><input class="clock" id="other" inputmode="numeric"></div></div></div><p style="font-size:13px">Czy miałeś co najmniej 3 godziny nieprzerwanego odpoczynku?</p><div style="display:flex;gap:16px;font-size:13px"><label><input type="radio" name="three" value="yes" ${r.three===true?'checked':''}> Tak</label><label><input type="radio" name="three" value="no" ${r.three===false?'checked':''}> Nie</label></div><button class="secondary" id="saveStart" style="margin-top:13px">Zapisz rozpoczęcie</button><button class="primary" id="saveEnd" style="margin-top:9px">Zapisz zakończenie</button>`:'<button class="primary" id="saveDay" style="margin-top:13px">Zapisz dzień</button>'}<div class="panel" id="rests" style="margin-top:12px;font-size:13px"></div>${exists?'<button class="secondary" id="delete" style="margin-top:10px;color:#d32222">Usuń wpis z tego dnia</button>':''}<p class="muted" id="error"></p>`;V.querySelector('#back').onclick=calendar;
+function refresh(){let old=db[k];db[k]={...r};let p=interval(k,r),a=alerts(k,r),l=left(k,r),q=right(k,r);if(old)db[k]=old;else delete db[k];V.querySelector('#rests').innerHTML=`<strong>Odpoczynki</strong><p>Tygodniowy przed pracą: <b style="color:#2475b8">${l===null?'—':human(l)}</b></p><p>Po dniówce: <b style="color:${a.short?'#d32222':'#2475b8'}">${q===null?'—':human(q)}</b></p>`;if(active)V.querySelector('#calc').innerHTML=p&&p.b!==null?`Dniówka: <b>${human(Math.round((p.b-p.a)/60000))}</b><div class="muted">${new Date(p.a).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})} → ${new Date(p.b).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div>${a.short?'<div class="warn">! Przerwa krótsza niż 9 godzin.</div>':''}${(cycleInfo(p.b).deadline!==null?`<div class="muted">Do rozpoczęcia następnego tygodniowego: ${human(Math.max(0,Math.round((cycleInfo(p.b).deadline-p.b)/60000)))}</div>`:'<div class="muted">144 h: brak pewnego początku cyklu.</div>')+`<div class="${a.nineLimit?'warn':'muted'}">Skrócone odpoczynki w cyklu: ${a.nineUsed+(a.nineCurrent?1:0)} z 3${a.nineCurrent?' (ta dniówka zalicza skrócenie)':''}${a.nineLimit?' — limit wyczerpany':''}${a.unknownCycle?' · Początek cyklu nieznany; wynik orientacyjny':''}.</div>`+a.hard.map(t=>`<div class="warn">! ${t}</div>`).join('')}`:valid(r.start)?'<b style="color:#2475b8">Rozpoczęcie gotowe do zapisu.</b>':'Wpisz godzinę rozpoczęcia.'}
+V.querySelectorAll('[name=type]').forEach(x=>x.onchange=()=>{r.type=x.value;details()});if(active){V.querySelector('#startOffset').onchange=e=>{r.startOffset=Number(e.target.value);refresh()};for(let f of ['start','end','drive','other'])mask(V.querySelector('#'+f),r[f],x=>{r[f]=x;refresh()},f==='drive'||f==='other');V.querySelectorAll('[name=three]').forEach(x=>x.onchange=()=>{r.three=x.value==='yes';refresh()});V.querySelector('#saveStart').onclick=()=>{if(!valid(r.start)){V.querySelector('#error').textContent='Wpisz pełną godzinę rozpoczęcia.';return}db[k]={...r,end:db[k]?.end||''};persist();calendar()};V.querySelector('#saveEnd').onclick=()=>{if(!valid(r.start)||!valid(r.end)){V.querySelector('#error').textContent='Wpisz rozpoczęcie i zakończenie.';return}db[k]={...r};persist();calendar()}}else V.querySelector('#saveDay').onclick=()=>{db[k]={type:r.type};persist();calendar()};if(exists)V.querySelector('#delete').onclick=()=>{delete db[k];persist();calendar()};refresh()}
+function settings(){V.innerHTML=`<button class="nav" id="back">← Kalendarz</button><h3>Odpoczynek tygodniowy</h3>${[['anchor','Koniec poprzedniego tygodniowego',anchor],['ws','Początek odpoczynku',ws],['we','Koniec odpoczynku',we]].map(([id,name,val])=>`<label class="muted">${name}</label><input class="dt" id="${id}" type="datetime-local" value="${val}" style="margin:5px 0 12px">`).join('')}<button class="primary" id="save">Zapisz</button><p class="muted" id="error"></p>`;V.querySelector('#back').onclick=calendar;V.querySelector('#save').onclick=()=>{let a=V.querySelector('#anchor').value,b=V.querySelector('#ws').value,c=V.querySelector('#we').value;if((a&&dt(a)===null)||(b||c)&&(!b||!c||dt(b)===null||dt(c)===null||dt(c)-dt(b)<24*H)){V.querySelector('#error').textContent='Wpisz obie daty odpoczynku tygodniowego (minimum 24 h) lub pozostaw je puste. Koniec poprzedniego odpoczynku jest opcjonalny.';return}anchor=a;ws=b;we=c;persist();calendar()}}
 calendar();
 // Dostosuj wysokość ramki do aktualnego widoku, także po wejściu w szczegóły.
 function reportHeight(){
