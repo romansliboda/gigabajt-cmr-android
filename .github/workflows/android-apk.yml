@@ -27,5 +27,5 @@ jobs:
         run: gradle :app:assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
-          name: Gigabajt-CMR-Android-12-6-debug
+                  name: Gigabajt-CMR-Android-12-9-debug
           path: app/build/outputs/apk/debug/app-debug.apk
