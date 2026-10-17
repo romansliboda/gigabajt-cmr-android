@@ -19,3 +19,7 @@ Implementacja:
 - zdjęcia z wejścia file picker wymagają sprawdzenia na konkretnym telefonie
 
 Nie był wykonany pełny kompilacyjny test GitHub Actions ani test na Androidzie. Najpierw sprawdź zapis PDF, import/eksport, aparat, GPS i działanie bez internetu. Dane aplikacji webowej NIE przeniosą się automatycznie do APK.
+
+
+Wersja 12.9 — GPS Android, ramka kalendarza, O aplikacji.
+Ważne: do GitHub trzeba wgrać Z ZACHOWANIEM ŚCIEŻEK (folder app/, .github/ itd). Przeglądarka GitHub upload files może spłaszczać strukturę, wtedy repozytorium będzie niepoprawne.
