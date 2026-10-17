@@ -902,6 +902,21 @@ function osmCompanyAddress(item){const t=item.tags||{};const street=[t['addr:str
 function osmCompanyName(item){const t=item.tags||{};return t.name||t['name:en']||''}
 function renderGPSCompanyChoices(){const root=document.getElementById('gpsLoadingChoices');root.textContent='';root.classList.remove('hidden');const help=document.createElement('p');help.className='hint';help.textContent='Wybierz właściwe miejsce: firmę, stację paliw, restaurację, sklep, hotel lub inny obiekt. Nazwa i dostępny adres trafią do rubryki 1 — Nadawca. Dane można poprawić ręcznie.';root.append(help);gpsLoadingResults.forEach((item,i)=>{const btn=document.createElement('button');btn.type='button';btn.className='gps-company-item';const name=document.createElement('strong');name.textContent=osmCompanyName(item);const addr=document.createElement('small');const d=Math.round(item.distance);const ad=osmCompanyAddress(item);addr.textContent=(ad||'Brak pełnego adresu w OpenStreetMap')+' · około '+d+' m';btn.append(name,addr);btn.addEventListener('click',()=>selectGPSLoadingCompany(i));root.append(btn)});const cancel=document.createElement('button');cancel.type='button';cancel.className='secondary';cancel.textContent='Anuluj — wpiszę ręcznie';cancel.addEventListener('click',()=>{gpsLoadingReset();gpsLoadingMessage('Możesz wpisać dane firmy ręcznie.')});root.append(cancel)}
 function selectGPSLoadingCompany(index){const c=gpsLoadingResults[index];if(!c)return;const name=osmCompanyName(c),address=osmCompanyAddress(c);const line=[name,address].filter(Boolean).join(', ');if(!line)return;if(!confirm('Wstawić do rubryki 1 — nadawca?\n\n'+line+'\n\nW razie potrzeby poprawisz adres ręcznie.'))return;const f=document.getElementById('sender');f.value=line;f.dispatchEvent(new Event('input',{bubbles:true}));gpsLoadingReset();gpsLoadingMessage('Wstawiono do rubryki 1: '+line);toast('Zatwierdzono nadawcę')}
+// GPS: krótka pamięć poprawnych wyników na wypadek chwilowej awarii Overpass.
+// Przechowujemy wyłącznie publiczne obiekty OSM oraz przybliżone współrzędne wyszukiwania.
+const GPS_OSM_CACHE_KEY='gb-osm-gps-cache-v1';
+function saveGPSNearbyCache(lat,lon,data){
+ try{const slim=(data.elements||[]).slice(0,180).map(x=>({type:x.type,id:x.id,lat:x.lat,lon:x.lon,center:x.center,tags:x.tags}));
+ localStorage.setItem(GPS_OSM_CACHE_KEY,JSON.stringify({lat,lon,ts:Date.now(),elements:slim}));}catch(e){}
+}
+function getGPSNearbyCache(lat,lon){
+ try{const cached=JSON.parse(localStorage.getItem(GPS_OSM_CACHE_KEY)||'null');
+ if(!cached||!Array.isArray(cached.elements)||Date.now()-cached.ts>45*60*1000)return null;
+ if(distanceMeters(lat,lon,cached.lat,cached.lon)>150)return null;
+ return {elements:cached.elements.filter(x=>{const a=x.lat??x.center?.lat,b=x.lon??x.center?.lon;
+ return typeof a==='number'&&typeof b==='number'&&distanceMeters(lat,lon,a,b)<=400;})};
+ }catch(e){return null;}
+}
 async function findLoadingCompany(){
  gpsLoadingReset();if(!appPermissions().location){gpsLoadingMessage('Włącz GPS w Ustawienia → Uprawnienia.');toast('Najpierw włącz lokalizację w ustawieniach');return}
  if(!navigator.geolocation){gpsLoadingMessage('GPS jest niedostępny w tej przeglądarce.');return}
@@ -915,6 +930,7 @@ async function findLoadingCompany(){
  // Lżejsze zapytanie: pojedyncze wyszukanie nazwanych miejsc zamiast 14 kosztownych skanów.
  // Ograniczenie do 400 m pozostaje bez zmian; zachowujemy nazwy i adresy punktów.
  const query='[out:json][timeout:20];nwr["name"]'+position+';out center 120;';
+ let fromCache=false;
  try{
  const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),75000);let data;
  try{
@@ -932,10 +948,15 @@ async function findLoadingCompany(){
     }catch(err){lastError=err;if(ctrl.signal.aborted)break;}
   }
   if(!data)throw lastError||Error('Brak odpowiedzi z serwerów map');
+}catch(networkError){
+  const cached=getGPSNearbyCache(lat,lon);
+  if(!cached||!cached.elements.length)throw networkError;
+  data=cached;fromCache=true;
 }finally{clearTimeout(timeout)}
+ if(!fromCache)saveGPSNearbyCache(lat,lon,data);
  const seen=new Set();gpsLoadingResults=(Array.isArray(data.elements)?data.elements:[]).filter(item=>{const n=osmCompanyName(item);if(!n)return false;const x=item.lat??item.center?.lat,y=item.lon??item.center?.lon;if(typeof x!=='number'||typeof y!=='number')return false;item.distance=distanceMeters(lat,lon,x,y);const id=(n+'|'+osmCompanyAddress(item)).toLocaleLowerCase();if(seen.has(id))return false;seen.add(id);return true}).sort((a,b)=>a.distance-b.distance).slice(0,30);
  if(!gpsLoadingResults.length){gpsLoadingMessage('W pobliżu nie znaleziono oznaczonych miejsc. Wpisz adres ręcznie.');return}
- gpsLoadingMessage('Znaleziono '+gpsLoadingResults.length+' miejsc. Sprawdź nazwę i adres przed zatwierdzeniem.');renderGPSCompanyChoices();
+ gpsLoadingMessage((fromCache?'Serwery map chwilowo nie odpowiadają. Wyświetlam zapisane miejsca z tej okolicy (do 45 min). ':'')+'Znaleziono '+gpsLoadingResults.length+' miejsc. Sprawdź adres przed zatwierdzeniem.');renderGPSCompanyChoices();
  }catch(e){gpsLoadingMessage('Nie udało się pobrać miejsc z map. '+String(e&&e.message||'Błąd połączenia')+'. Nadawcę możesz wpisać ręcznie.')}
 }
 
