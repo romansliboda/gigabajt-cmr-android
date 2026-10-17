@@ -139,9 +139,9 @@ function alerts(k,r){
  out.nineRemaining=Math.max(0,3-out.nineUsed-(out.nineCurrent?1:0));
  out.nineLimit=out.nineUsed>=3;
  if(out.nineCurrent&&out.nineLimit)out.hard.push('Czwarta skrócona pauza dobowa — trzy dziewiątki już wykorzystane.');
- if(duration>15&&r.three!==true)out.hard.push('Dniówka ponad 15 godzin: nie da się zmieścić 9 godzin odpoczynku w okresie 24 h.');
- if(g!==null&&g<540&&r.type!=='return'&&r.type!=='depart')out.hard.push('Odpoczynek pomiędzy zmianami krótszy niż 9 godzin.');
- out.short=g!==null&&g>=0&&g<540&&r.type!=='return'&&r.type!=='depart';
+ if(duration>15)out.hard.push('UWAGA! Przekroczyłeś 15 godzin pracy! Wysokie ryzyko naruszenia przepisów i otrzymania wysokiego mandatu!');
+ if(g!==null&&g>=0&&g<540)out.hard.push('! ODPOCZYNEK NIEZALICZONY: poniżej 9 godzin. UWAGA — ryzyko wysokiego mandatu. Sprawdź dane tachografu i obowiązujące wyjątki.');
+ out.short=g!==null&&g>=0&&g<540;
  return out;
 }
 function color(k,r){
@@ -232,7 +232,7 @@ function settings(){V.innerHTML=`<button class="nav" id="back">← Kalendarz</bu
 calendar();
 // Dostosuj wysokość ramki do aktualnego widoku, także po wejściu w szczegóły.
 function reportHeight(){
-  const h=Math.ceil(Math.max(document.body.scrollHeight,document.documentElement.scrollHeight,V.getBoundingClientRect().bottom))+6;
+  const h=Math.ceil(V.getBoundingClientRect().bottom)+6;
   window.parent.postMessage({type:'gigabajt-calendar-height',height:h},window.location.origin);
 }
 if(typeof ResizeObserver!=='undefined')new ResizeObserver(reportHeight).observe(V);
