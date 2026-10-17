@@ -105,16 +105,13 @@ public class MainActivity extends Activity {
      HttpURLConnection con=null;
      String server=host.contains("private.coffee")?"Private.coffee":"Overpass DE";
      try{
-      URL url=new URL(host);
+      // GET matches the small browser-tested Overpass request format.
+      URL url=new URL(host+"?data="+URLEncoder.encode(query,"UTF-8"));
       con=(HttpURLConnection)url.openConnection();
-      con.setRequestMethod("POST");
-      con.setConnectTimeout(10000);con.setReadTimeout(22000);
-      con.setDoOutput(true);
-      con.setRequestProperty("Content-Type","text/plain; charset=UTF-8");
-      con.setRequestProperty("Accept","application/json");
-      con.setRequestProperty("User-Agent","GigabajtCMR/12.9 (+https://github.com/romansliboda/gigabajt-cmr-android)");
-      byte[] bytes=query.getBytes("UTF-8");
-      try(OutputStream output=con.getOutputStream()){output.write(bytes);}
+      con.setRequestMethod("GET");
+      con.setConnectTimeout(15000);con.setReadTimeout(45000);
+      con.setRequestProperty("Accept","application/json, */*");
+      con.setRequestProperty("User-Agent","GigabajtCMR/13.0 (Android; contact: github.com/romansliboda/gigabajt-cmr-android)");
       int status=con.getResponseCode();
       if(status!=200){
        if(diagnostics.length()>0)diagnostics.append("; ");

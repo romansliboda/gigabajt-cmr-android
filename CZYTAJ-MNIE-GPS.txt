@@ -1,0 +1,3 @@
+Gigabajt CMR 13.0 — TEST GPS. Zmiana tylko MainActivity.java (GET, Overpass DE najpierw) i index.html (lzejsze zapytanie o obiekty). Nie zmieniono kalendarza, PDF, formularza CMR. Test wymaga internetu. Publiczne serwery moga odrzucac zapytania.
+
+WERSJA 13.0: oznaczenie wersji zmienione z 12.9 na 13.0. To paczka aktualizacyjna, nie kompletny projekt; rozpakuj w katalogu repozytorium.
