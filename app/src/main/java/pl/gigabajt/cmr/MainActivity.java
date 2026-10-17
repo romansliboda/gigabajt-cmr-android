@@ -99,35 +99,42 @@ public class MainActivity extends Activity {
   @JavascriptInterface public void searchOverpass(String query,String id){
    if(query==null || query.length()>16000 || id==null || !id.matches("[0-9]{1,12}"))return;
    new Thread(()->{
-    String[] hosts={"https://overpass-api.de/api/interpreter","https://overpass.private.coffee/api/interpreter"};
-    String failure="Serwery map nie odpowiedziały";
+    String[] hosts={"https://overpass.private.coffee/api/interpreter","https://overpass-api.de/api/interpreter"};
+    StringBuilder diagnostics=new StringBuilder();
     for(String host:hosts){
      HttpURLConnection con=null;
+     String server=host.contains("private.coffee")?"Private.coffee":"Overpass DE";
      try{
       URL url=new URL(host);
       con=(HttpURLConnection)url.openConnection();
       con.setRequestMethod("POST");
-      con.setConnectTimeout(10000);con.setReadTimeout(22000);
+      con.setConnectTimeout(12000);con.setReadTimeout(30000);
       con.setDoOutput(true);
       con.setRequestProperty("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
       con.setRequestProperty("Accept","application/json");
-      con.setRequestProperty("User-Agent","GigabajtCMR/12.9 (Android; OpenStreetMap client)");
+      con.setRequestProperty("User-Agent","GigabajtCMR/12.9 (+https://github.com/romansliboda/gigabajt-cmr-android)");
       byte[] bytes=("data="+URLEncoder.encode(query,"UTF-8")).getBytes("UTF-8");
       try(OutputStream output=con.getOutputStream()){output.write(bytes);}
       int status=con.getResponseCode();
-      if(status!=200){failure="Odpowiedź map: HTTP "+status;continue;}
+      if(status!=200){
+       if(diagnostics.length()>0)diagnostics.append("; ");
+       diagnostics.append(server).append(": HTTP ").append(status);
+       continue;
+      }
       ByteArrayOutputStream data=new ByteArrayOutputStream();
       try(InputStream input=con.getInputStream()){
        byte[] buf=new byte[8192];int n;
        while((n=input.read(buf))!=-1){data.write(buf,0,n);if(data.size()>5_000_000)throw new IllegalStateException("Zbyt duża odpowiedź mapy");}
       }
       String json=data.toString("UTF-8");
-      if(!json.trim().startsWith("{"))throw new IllegalStateException("Niepoprawna odpowiedź serwera");
+      if(!json.trim().startsWith("{"))throw new IllegalStateException("Nieprawidłowa odpowiedź serwera");
       nativeMapResult(id,true,json);return;
-     }catch(Exception ex){failure="Nie udało się pobrać danych z map: "+ex.getClass().getSimpleName();}
-     finally{if(con!=null)con.disconnect();}
+     }catch(Exception ex){
+      if(diagnostics.length()>0)diagnostics.append("; ");
+      diagnostics.append(server).append(": ").append(ex.getClass().getSimpleName());
+     }finally{if(con!=null)con.disconnect();}
     }
-    nativeMapResult(id,false,failure);
+    nativeMapResult(id,false,"Błędy serwerów: "+diagnostics.toString());
    },"CMR-OSM").start();
   }
   @JavascriptInterface public void saveFile(String name,String mime,String base64){

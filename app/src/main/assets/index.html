@@ -914,7 +914,7 @@ async function findLoadingCompany(){
  // zakłady, magazyny, hotele, centra logistyczne i inne obiekty z nazwą w OpenStreetMap.
  // Lżejsze zapytanie: pojedyncze wyszukanie nazwanych miejsc zamiast 14 kosztownych skanów.
  // Ograniczenie do 400 m pozostaje bez zmian; zachowujemy nazwy i adresy punktów.
- const query='[out:json][timeout:25];nwr'+position+'["name"];out center 180;';
+ const query='[out:json][timeout:20];nwr["name"]'+position+';out center 120;';
  try{
  const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),75000);let data;
  try{
