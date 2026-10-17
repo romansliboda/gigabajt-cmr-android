@@ -99,7 +99,7 @@ public class MainActivity extends Activity {
   @JavascriptInterface public void searchOverpass(String query,String id){
    if(query==null || query.length()>16000 || id==null || !id.matches("[0-9]{1,12}"))return;
    new Thread(()->{
-    String[] hosts={"https://overpass.private.coffee/api/interpreter","https://overpass-api.de/api/interpreter"};
+    String[] hosts={"https://overpass-api.de/api/interpreter","https://overpass.private.coffee/api/interpreter"};
     StringBuilder diagnostics=new StringBuilder();
     for(String host:hosts){
      HttpURLConnection con=null;
@@ -108,12 +108,12 @@ public class MainActivity extends Activity {
       URL url=new URL(host);
       con=(HttpURLConnection)url.openConnection();
       con.setRequestMethod("POST");
-      con.setConnectTimeout(12000);con.setReadTimeout(30000);
+      con.setConnectTimeout(10000);con.setReadTimeout(22000);
       con.setDoOutput(true);
-      con.setRequestProperty("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
+      con.setRequestProperty("Content-Type","text/plain; charset=UTF-8");
       con.setRequestProperty("Accept","application/json");
       con.setRequestProperty("User-Agent","GigabajtCMR/12.9 (+https://github.com/romansliboda/gigabajt-cmr-android)");
-      byte[] bytes=("data="+URLEncoder.encode(query,"UTF-8")).getBytes("UTF-8");
+      byte[] bytes=query.getBytes("UTF-8");
       try(OutputStream output=con.getOutputStream()){output.write(bytes);}
       int status=con.getResponseCode();
       if(status!=200){
