@@ -912,11 +912,9 @@ async function findLoadingCompany(){
  const position='(around:400,'+lat+','+lon+')';
  // Wszystkie typy oznaczonych punktów usługowych: stacje paliw, restauracje, sklepy,
  // zakłady, magazyny, hotele, centra logistyczne i inne obiekty z nazwą w OpenStreetMap.
- const categories=['amenity','shop','office','craft','industrial','tourism','leisure','healthcare','man_made','aeroway','railway','public_transport'];
- const parts=categories.map(k=>'nwr'+position+'["name"]["'+k+'"];');
- parts.push('nwr'+position+'["name"]["building"~"commercial|retail|industrial|warehouse|hotel|supermarket|restaurant"];');
- parts.push('nwr'+position+'["name"]["landuse"="industrial"];');
- const query='[out:json][timeout:25];('+parts.join('')+');out center 250;';
+ // Lżejsze zapytanie: pojedyncze wyszukanie nazwanych miejsc zamiast 14 kosztownych skanów.
+ // Ograniczenie do 400 m pozostaje bez zmian; zachowujemy nazwy i adresy punktów.
+ const query='[out:json][timeout:25];nwr'+position+'["name"];out center 180;';
  try{
  const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),75000);let data;
  try{
