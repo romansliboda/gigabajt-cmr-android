@@ -32,6 +32,12 @@ import android.webkit.WebResourceResponse;
 
 import java.io.OutputStream;
 import java.net.URLConnection;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import org.json.JSONObject;
 
 public class MainActivity extends Activity {
  private static final int PICK_FILE=110;
@@ -89,6 +95,41 @@ public class MainActivity extends Activity {
   web.loadUrl("https://appassets.androidplatform.net/assets/index.html");
  }
  public class NativeBridge {
+  // Only two fixed HTTPS Overpass endpoints are allowed; query is never a URL.
+  @JavascriptInterface public void searchOverpass(String query,String id){
+   if(query==null || query.length()>16000 || id==null || !id.matches("[0-9]{1,12}"))return;
+   new Thread(()->{
+    String[] hosts={"https://overpass.private.coffee/api/interpreter","https://overpass-api.de/api/interpreter"};
+    String failure="Serwery map nie odpowiedziały";
+    for(String host:hosts){
+     HttpURLConnection con=null;
+     try{
+      URL url=new URL(host);
+      con=(HttpURLConnection)url.openConnection();
+      con.setRequestMethod("POST");
+      con.setConnectTimeout(9000);con.setReadTimeout(14000);
+      con.setDoOutput(true);
+      con.setRequestProperty("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
+      con.setRequestProperty("Accept","application/json");
+      con.setRequestProperty("User-Agent","GigabajtCMR/12.9 (Android; OpenStreetMap client)");
+      byte[] bytes=("data="+URLEncoder.encode(query,"UTF-8")).getBytes("UTF-8");
+      try(OutputStream output=con.getOutputStream()){output.write(bytes);}
+      int status=con.getResponseCode();
+      if(status!=200){failure="Odpowiedź map: HTTP "+status;continue;}
+      ByteArrayOutputStream data=new ByteArrayOutputStream();
+      try(InputStream input=con.getInputStream()){
+       byte[] buf=new byte[8192];int n;
+       while((n=input.read(buf))!=-1){data.write(buf,0,n);if(data.size()>5_000_000)throw new IllegalStateException("Zbyt duża odpowiedź mapy");}
+      }
+      String json=data.toString("UTF-8");
+      if(!json.trim().startsWith("{"))throw new IllegalStateException("Niepoprawna odpowiedź serwera");
+      nativeMapResult(id,true,json);return;
+     }catch(Exception ex){failure="Nie udało się pobrać danych z map: "+ex.getClass().getSimpleName();}
+     finally{if(con!=null)con.disconnect();}
+    }
+    nativeMapResult(id,false,failure);
+   },"CMR-OSM").start();
+  }
   @JavascriptInterface public void saveFile(String name,String mime,String base64){
    // Never parse HTML input as a filesystem path; MediaStore writes into Downloads.
    try {
@@ -117,6 +158,10 @@ public class MainActivity extends Activity {
     printable.loadDataWithBaseURL("https://appassets.androidplatform.net/assets/",html,"text/html","UTF-8",null);
    });
   }
+ }
+ private void nativeMapResult(String id,boolean ok,String payload){
+  String js="window.gbOverpassNativeResult("+JSONObject.quote(id)+","+(ok?"true":"false")+","+JSONObject.quote(payload)+")";
+  runOnUiThread(()->{if(web!=null)web.evaluateJavascript(js,null);});
  }
  @Override protected void onActivityResult(int request,int result,Intent data){
   super.onActivityResult(request,result,data);
