@@ -99,7 +99,7 @@ public class MainActivity extends Activity {
   @JavascriptInterface public void searchOverpass(String query,String id){
    if(query==null || query.length()>16000 || id==null || !id.matches("[0-9]{1,12}"))return;
    new Thread(()->{
-    String[] hosts={"https://overpass.private.coffee/api/interpreter","https://overpass-api.de/api/interpreter"};
+    String[] hosts={"https://overpass-api.de/api/interpreter","https://overpass.private.coffee/api/interpreter"};
     String failure="Serwery map nie odpowiedziały";
     for(String host:hosts){
      HttpURLConnection con=null;
@@ -107,7 +107,7 @@ public class MainActivity extends Activity {
       URL url=new URL(host);
       con=(HttpURLConnection)url.openConnection();
       con.setRequestMethod("POST");
-      con.setConnectTimeout(9000);con.setReadTimeout(14000);
+      con.setConnectTimeout(10000);con.setReadTimeout(22000);
       con.setDoOutput(true);
       con.setRequestProperty("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
       con.setRequestProperty("Accept","application/json");

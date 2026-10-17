@@ -918,9 +918,9 @@ async function findLoadingCompany(){
  parts.push('nwr'+position+'["name"]["landuse"="industrial"];');
  const query='[out:json][timeout:25];('+parts.join('')+');out center 250;';
  try{
- const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),32000);let data;
+ const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),75000);let data;
  try{
-  const servers=['https://overpass.private.coffee/api/interpreter','https://overpass-api.de/api/interpreter'];
+  const servers=['https://overpass-api.de/api/interpreter','https://overpass.private.coffee/api/interpreter'];
   let lastError=null;
   for(let i=0;i<servers.length;i++){
     if(i>0)gpsLoadingMessage('Pierwszy serwer nie odpowiedział. Próbuję zapasowego serwera map…');
@@ -938,7 +938,7 @@ async function findLoadingCompany(){
  const seen=new Set();gpsLoadingResults=(Array.isArray(data.elements)?data.elements:[]).filter(item=>{const n=osmCompanyName(item);if(!n)return false;const x=item.lat??item.center?.lat,y=item.lon??item.center?.lon;if(typeof x!=='number'||typeof y!=='number')return false;item.distance=distanceMeters(lat,lon,x,y);const id=(n+'|'+osmCompanyAddress(item)).toLocaleLowerCase();if(seen.has(id))return false;seen.add(id);return true}).sort((a,b)=>a.distance-b.distance).slice(0,30);
  if(!gpsLoadingResults.length){gpsLoadingMessage('W pobliżu nie znaleziono oznaczonych miejsc. Wpisz adres ręcznie.');return}
  gpsLoadingMessage('Znaleziono '+gpsLoadingResults.length+' miejsc. Sprawdź nazwę i adres przed zatwierdzeniem.');renderGPSCompanyChoices();
- }catch(e){gpsLoadingMessage('Serwery map są chwilowo niedostępne. Sprawdź internet albo spróbuj ponownie za chwilę. Nadawcę możesz wpisać ręcznie.')}
+ }catch(e){gpsLoadingMessage('Nie udało się pobrać miejsc z map. '+String(e&&e.message||'Błąd połączenia')+'. Nadawcę możesz wpisać ręcznie.')}
 }
 
 /* Android 12.9: native HTTPS requests for Overpass, browser code unchanged. */
@@ -954,7 +954,7 @@ async function findLoadingCompany(){
   return new Promise((resolve,reject)=>{
    const id=String(++seq);
    if(signal && signal.aborted){reject(new Error('Przekroczono czas oczekiwania'));return;}
-   const timer=setTimeout(()=>{pending.delete(id);reject(new Error('Przekroczono czas oczekiwania na mapę'));},31000);
+   const timer=setTimeout(()=>{pending.delete(id);reject(new Error('Przekroczono czas oczekiwania na mapę'));},70000);
    pending.set(id,{resolve,reject,timer});
    try{window.AndroidCMR.searchOverpass(query,id);}catch(err){clearTimeout(timer);pending.delete(id);reject(err);}
   });
