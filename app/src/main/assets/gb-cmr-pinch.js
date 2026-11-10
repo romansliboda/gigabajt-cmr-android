@@ -164,10 +164,9 @@ window.gbCMRInitArchivePinch=()=>{
  if(!frame||!holder)return;
 
  // Zachowaj oryginalna wysokosc pola podgladu.
- const height=frame.getBoundingClientRect().height;
- const oldZoom=parseFloat(holder.style.zoom)||.33;
+ // Dopasowanie do stalej ramki Historii CMR.
 
- frame.style.height=Math.round(height)+'px';
+ frame.style.height='min(50vh, 430px)';
  frame.style.padding='0';
  frame.style.position='relative';
  frame.style.overflow='hidden';
@@ -181,7 +180,7 @@ window.gbCMRInitArchivePinch=()=>{
  holder.style.transformOrigin='0 0';
  holder.style.willChange='transform';
 
- let scale=clamp(oldZoom,.16,3.2);
+ let scale=1;
  let x=0,y=0,pinch=null;
  const fingers=new Map();
 
@@ -225,8 +224,16 @@ window.gbCMRInitArchivePinch=()=>{
   };
  }
 
- x=(frame.clientWidth-holder.offsetWidth*scale)/2;
- y=(frame.clientHeight-holder.offsetHeight*scale)/2;
+ const dw=holder.offsetWidth||794;
+ const dh=holder.offsetHeight||1123;
+
+ scale=clamp(Math.min(
+  (frame.clientWidth-24)/dw,
+  (frame.clientHeight-24)/dh
+ ),.16,3.2);
+
+ x=(frame.clientWidth-dw*scale)/2;
+ y=(frame.clientHeight-dh*scale)/2;
  paint();
 
  frame.addEventListener('pointerdown',e=>{
