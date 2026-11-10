@@ -18,10 +18,21 @@
  #pdfReport .pdfstats span{padding:8px;border:1px solid #cbd5e1;border-radius:5px}
  #pdfReport .pdfnote{font-size:10px;color:#64748b;margin-top:12px}
 }
+
+/* CMR 13.5: dzisiejszy dzien */
+.tile.is-today{
+ border:2px solid #20b967!important;
+ box-shadow:
+  0 0 0 1px rgba(38,190,105,.8),
+  0 0 11px 2px rgba(38,190,105,.45);
+ z-index:1;
+}
 </style></head><body><main id="app"></main><section id="pdfReport" aria-hidden="true"></section><script>
 (()=>{'use strict';
 const V=document.getElementById('app'),P=n=>String(n).padStart(2,'0'),H=3600000,mo=['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'],KEY='gigabajt-cmr-kalendarz-v23-test-v10-directpdf';
-let Y=2026,M=9,selected=0,draft=null,db={},anchor='',ws='',we='';
+const VIEW_KEY='gigabajt-cmr-last-calendar-view-v1';
+const startupDate=new Date();
+let Y=startupDate.getFullYear(),M=startupDate.getMonth(),selected=0,draft=null,db={},anchor='',ws='',we='';
 try{
  let saved=JSON.parse(localStorage.getItem(KEY)||'null');
  if(!saved){
@@ -30,6 +41,24 @@ try{
   if(prior&&prior.db){db=prior.db;anchor=prior.anchor||'';ws=prior.ws||'';we=prior.we||'';}
  }else if(saved.db){db=saved.db;anchor=saved.anchor||'';ws=saved.ws||'';we=saved.we||''}
 }catch(e){}
+
+try{
+ const last=JSON.parse(localStorage.getItem(VIEW_KEY)||'null');
+ if(last && Number.isInteger(last.y) &&
+    last.y>=1900 && last.y<=9999 &&
+    Number.isInteger(last.m) &&
+    last.m>=0 && last.m<=11){
+  Y=last.y;
+  M=last.m;
+ }
+}catch(e){}
+
+function persistView(){
+ try{
+  localStorage.setItem(VIEW_KEY,JSON.stringify({y:Y,m:M}));
+ }catch(e){}
+}
+
 function persist(){try{localStorage.setItem(KEY,JSON.stringify({db,anchor,ws,we}))}catch(e){}}
 const key=d=>`${Y}-${P(M+1)}-${P(d)}`,dDate=k=>{let a=k.split('-').map(Number);return new Date(a[0],a[1]-1,a[2])},work=r=>r&&(r.type==='work'||r.type==='return'||r.type==='depart'),valid=s=>/^\d{4}$/.test(s||'')&&+s.slice(0,2)<24&&+s.slice(2)<60,dur=s=>/^\d{4}$/.test(s||'')&&+s.slice(2)<60?+s.slice(0,2)*60+ +s.slice(2):null,dt=s=>{let x=s?new Date(s):null;return x&&Number.isFinite(+x)?+x:null},fmt=s=>valid(s)?s.slice(0,2)+':'+s.slice(2):'',human=n=>`${Math.floor(n/60)} godz. ${P(n%60)} min`;
 const paths={truck:'<rect x="2" y="6" width="13" height="10" rx="1"/><path d="M15 9h4l3 3v4h-7"/><circle cx="6.5" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',home:'<path d="m3 11 9-8 9 8"/><path d="M5 10v11h14V10"/><path d="M9 21v-7h6v7"/>',bed:'<path d="M3 5v16M21 11v10M3 17h18v4M3 11h18v6M7 11V7h9v4"/>'};
@@ -152,7 +181,7 @@ function color(k,r){
  let n=(p.b-p.a)/60000;
  return n>900?'red':n>780?'yellow':'green';
 }
-function calendar(){let off=(new Date(Y,M,1).getDay()+6)%7,n=new Date(Y,M+1,0).getDate(),cells='';for(let i=0;i<Math.ceil((off+n)/7)*7;i++){let d=i-off+1;if(d<1||d>n){cells+='<span></span>';continue}let k=key(d),r=db[k],a=alerts(k,r),l=left(k,r),rr=right(k,r),p=interval(k,r);cells+=`<button class="tile ${color(k,r)}" data-day="${d}">${l!==null?`<span class="left">${Math.floor(l/60)}h</span>`:''}${rr!==null&&rr>=60?`<span class="right ${a.short?'bad':''}">${Math.floor(rr/60)}h</span>`:''}${a.hard.length||a.short?'<span class="bang">!</span>':''}<span style="font-size:12px">${d}</span><span style="height:17px">${r?icon(sym(r.type)):''}</span>${a.nineCurrent?'<span class="nineflag">9</span>':''}${p&&p.b===null?'<span class="started">START</span>':''}</button>`}let w=week(),last=shifts().at(-1),cycle=cycleInfo(last?(last.b||last.a):Date.now());V.innerHTML=`<div class="top"><strong style="font-size:20px">Kalendarz kierowcy</strong><span>▦</span></div><div class="top"><button class="nav" id="prev">‹</button><strong>${mo[M]} ${Y}</strong><button class="nav" id="next">›</button></div><div class="grid">${['Pn','Wt','Śr','Cz','Pt','So','Nd'].map(x=>`<span class="muted" style="text-align:center">${x}</span>`).join('')}${cells}</div><div style="display:flex;gap:13px;flex-wrap:wrap;margin:14px 0;font-size:12px"><span>${icon('truck')} Praca</span><span>${icon('bed')} Odpoczynek</span><span>${icon('home')} Dom</span></div><div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:12px"><span><b style="color:#36aa6b">●</b> do 13 h</span><span><b style="color:#dfb51c">●</b> 13–15 h</span><span><b style="color:#d42b2b">●</b> >15 h/alarm</span></div><button class="primary" id="summary">Zestawienie miesiąca</button><div class="panel" style="margin-top:13px"><div class="top" style="margin:0"><strong style="font-size:13px">Odpoczynek tygodniowy i 144 h</strong><button class="nav" id="settings">Ustaw</button></div><p class="muted" style="margin:8px 0 0">${cycle.ref!==null?'Cykl 144 h od '+new Date(cycle.ref).toLocaleString('pl-PL')+'. Kolejny odpoczynek tygodniowy zacznij do '+new Date(cycle.deadline).toLocaleString('pl-PL'):'Nie ustalono jeszcze początku cyklu 144 h. Kalendarz wyznaczy go z zapisanych odpoczynków tygodniowych. Jeśli nie ma wcześniejszych wpisów, ustaw datę zakończenia poprzedniego odpoczynku.'}</p></div>`;V.querySelector('#summary').onclick=summary;V.querySelector('#settings').onclick=settings;V.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>{selected=+b.dataset.day;draft={type:'work',start:'',end:'',drive:'',other:'',three:null,...(db[key(selected)]||{})};details()});for(let [id,z] of [['prev',-1],['next',1]])V.querySelector('#'+id).onclick=()=>{let d=new Date(Y,M+z,1);Y=d.getFullYear();M=d.getMonth();calendar()}}
+function calendar(){const today=new Date();let off=(new Date(Y,M,1).getDay()+6)%7,n=new Date(Y,M+1,0).getDate(),cells='';for(let i=0;i<Math.ceil((off+n)/7)*7;i++){let d=i-off+1;if(d<1||d>n){cells+='<span></span>';continue}let k=key(d),r=db[k],a=alerts(k,r),l=left(k,r),rr=right(k,r),p=interval(k,r);cells+=`<button class="tile ${color(k,r)}${Y===today.getFullYear()&&M===today.getMonth()&&d===today.getDate()?' is-today':''}" data-day="${d}">${l!==null?`<span class="left">${Math.floor(l/60)}h</span>`:''}${rr!==null&&rr>=60?`<span class="right ${a.short?'bad':''}">${Math.floor(rr/60)}h</span>`:''}${a.hard.length||a.short?'<span class="bang">!</span>':''}<span style="font-size:12px">${d}</span><span style="height:17px">${r?icon(sym(r.type)):''}</span>${a.nineCurrent?'<span class="nineflag">9</span>':''}${p&&p.b===null?'<span class="started">START</span>':''}</button>`}let w=week(),last=shifts().at(-1),cycle=cycleInfo(last?(last.b||last.a):Date.now());V.innerHTML=`<div class="top"><strong style="font-size:20px">Kalendarz kierowcy</strong><span>▦</span></div><div class="top"><button class="nav" id="prev">‹</button><strong>${mo[M]} ${Y}</strong><button class="nav" id="next">›</button></div><div class="grid">${['Pn','Wt','Śr','Cz','Pt','So','Nd'].map(x=>`<span class="muted" style="text-align:center">${x}</span>`).join('')}${cells}</div><div style="display:flex;gap:13px;flex-wrap:wrap;margin:14px 0;font-size:12px"><span>${icon('truck')} Praca</span><span>${icon('bed')} Odpoczynek</span><span>${icon('home')} Dom</span></div><div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:12px"><span><b style="color:#36aa6b">●</b> do 13 h</span><span><b style="color:#dfb51c">●</b> 13–15 h</span><span><b style="color:#d42b2b">●</b> >15 h/alarm</span></div><button class="primary" id="summary">Zestawienie miesiąca</button><div class="panel" style="margin-top:13px"><div class="top" style="margin:0"><strong style="font-size:13px">Odpoczynek tygodniowy i 144 h</strong><button class="nav" id="settings">Ustaw</button></div><p class="muted" style="margin:8px 0 0">${cycle.ref!==null?'Cykl 144 h od '+new Date(cycle.ref).toLocaleString('pl-PL')+'. Kolejny odpoczynek tygodniowy zacznij do '+new Date(cycle.deadline).toLocaleString('pl-PL'):'Nie ustalono jeszcze początku cyklu 144 h. Kalendarz wyznaczy go z zapisanych odpoczynków tygodniowych. Jeśli nie ma wcześniejszych wpisów, ustaw datę zakończenia poprzedniego odpoczynku.'}</p></div>`;V.querySelector('#summary').onclick=summary;V.querySelector('#settings').onclick=settings;V.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>{selected=+b.dataset.day;draft={type:'work',start:'',end:'',drive:'',other:'',three:null,...(db[key(selected)]||{})};details()});for(let [id,z] of [['prev',-1],['next',1]])V.querySelector('#'+id).onclick=()=>{let d=new Date(Y,M+z,1);Y=d.getFullYear();M=d.getMonth();persistView();calendar()}}
 const categories=[['days','Ukończone dniówki'],['total','Łączny czas dniówek'],['drive','Czas prowadzenia pojazdu'],['other','Czas innej pracy']];
 function monthly(){let a=[];for(let d=1;d<=new Date(Y,M+1,0).getDate();d++){let k=key(d),r=db[k];if(!r)continue;let p=interval(k,r);a.push({d,r,span:p&&p.b!==null?Math.round((p.b-p.a)/60000):null,drive:dur(r.drive),other:dur(r.other)})}return a}
 function sums(){let rows=monthly();return {days:rows.filter(x=>x.span!==null).length,total:rows.reduce((s,x)=>s+(x.span||0),0),drive:rows.reduce((s,x)=>s+(x.drive||0),0),other:rows.reduce((s,x)=>s+(x.other||0),0)}}
