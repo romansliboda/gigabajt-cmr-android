@@ -2,7 +2,7 @@ plugins { id 'com.android.application' }
 android {
  namespace 'pl.gigabajt.cmr'
  compileSdk 35
- defaultConfig { applicationId 'pl.gigabajt.cmr'; minSdk 26; targetSdk 35; versionCode 132; versionName '13.2' }
+ defaultConfig { applicationId 'pl.gigabajt.cmr'; minSdk 26; targetSdk 35; versionCode 133; versionName '13.3' }
  signingConfigs {
   cmrRelease {
     storeFile file(System.getenv('CMR_KEYSTORE_FILE') ?: 'missing-cmr-key.p12')

@@ -150,3 +150,146 @@ window.addEventListener('resize',()=>{
  if(!modal.hidden)requestAnimationFrame(fit);
 });
 })();
+
+/* GB_CMR_ARCHIVE_PINCH_133 */
+(()=>{
+'use strict';
+
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+window.gbCMRInitArchivePinch=()=>{
+ const root=document.getElementById('archiveData');
+ const frame=root&&root.querySelector('.paper-scroll');
+ const holder=root&&root.querySelector('.paper-holder');
+ if(!frame||!holder)return;
+
+ // Zachowaj oryginalna wysokosc pola podgladu.
+ const height=frame.getBoundingClientRect().height;
+ const oldZoom=parseFloat(holder.style.zoom)||.33;
+
+ frame.style.height=Math.round(height)+'px';
+ frame.style.padding='0';
+ frame.style.position='relative';
+ frame.style.overflow='hidden';
+ frame.style.touchAction='none';
+
+ holder.style.zoom='1';
+ holder.style.position='absolute';
+ holder.style.left='0';
+ holder.style.top='0';
+ holder.style.margin='0';
+ holder.style.transformOrigin='0 0';
+ holder.style.willChange='transform';
+
+ let scale=clamp(oldZoom,.16,3.2);
+ let x=0,y=0,pinch=null;
+ const fingers=new Map();
+
+ function paint(){
+  const w=frame.clientWidth;
+  const h=frame.clientHeight;
+  const sw=holder.offsetWidth*scale;
+  const sh=holder.offsetHeight*scale;
+  const edge=12;
+
+  x=sw<=w-2*edge
+   ?(w-sw)/2
+   :clamp(x,w-sw-edge,edge);
+
+  y=sh<=h-2*edge
+   ?(h-sh)/2
+   :clamp(y,h-sh-edge,edge);
+
+  holder.style.transform=
+   `translate3d(${x}px,${y}px,0) scale(${scale})`;
+ }
+
+ function pinchStart(){
+  const p=[...fingers.values()].slice(0,2);
+  if(p.length!==2){
+   pinch=null;
+   return;
+  }
+
+  const r=frame.getBoundingClientRect();
+  const mx=(p[0].x+p[1].x)/2-r.left;
+  const my=(p[0].y+p[1].y)/2-r.top;
+
+  pinch={
+   dist:Math.max(1,Math.hypot(
+    p[1].x-p[0].x,p[1].y-p[0].y
+   )),
+   scale,
+   ax:(mx-x)/scale,
+   ay:(my-y)/scale
+  };
+ }
+
+ x=(frame.clientWidth-holder.offsetWidth*scale)/2;
+ y=(frame.clientHeight-holder.offsetHeight*scale)/2;
+ paint();
+
+ frame.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+
+  if(e.cancelable)e.preventDefault();
+
+  try{
+   frame.setPointerCapture(e.pointerId);
+  }catch(_){}
+
+  fingers.set(e.pointerId,{
+   x:e.clientX,y:e.clientY
+  });
+
+  if(fingers.size>=2)pinchStart();
+ });
+
+ frame.addEventListener('pointermove',e=>{
+  const old=fingers.get(e.pointerId);
+  if(!old)return;
+
+  if(e.cancelable)e.preventDefault();
+
+  fingers.set(e.pointerId,{
+   x:e.clientX,y:e.clientY
+  });
+
+  if(fingers.size===1){
+   x+=e.clientX-old.x;
+   y+=e.clientY-old.y;
+  }else{
+   if(!pinch)pinchStart();
+
+   const p=[...fingers.values()].slice(0,2);
+   const r=frame.getBoundingClientRect();
+   const mx=(p[0].x+p[1].x)/2-r.left;
+   const my=(p[0].y+p[1].y)/2-r.top;
+
+   const dist=Math.max(1,Math.hypot(
+    p[1].x-p[0].x,p[1].y-p[0].y
+   ));
+
+   scale=clamp(
+    pinch.scale*dist/pinch.dist,.16,3.2
+   );
+
+   x=mx-pinch.ax*scale;
+   y=my-pinch.ay*scale;
+  }
+
+  paint();
+ });
+
+ function finish(e){
+  fingers.delete(e.pointerId);
+
+  if(fingers.size>=2)pinchStart();
+  else pinch=null;
+ }
+
+ frame.addEventListener('pointerup',finish);
+ frame.addEventListener('pointercancel',finish);
+ frame.addEventListener('lostpointercapture',finish);
+};
+})();
