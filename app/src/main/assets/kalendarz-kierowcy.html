@@ -217,10 +217,26 @@ function exportMonthPDF(){
  }
  safeLine();text('Raport opiera się na zapisanych danych. Nie zastępuje tachografu.',margin,y,'18px Arial','#64748b');
  images.push(canvas.toDataURL('image/jpeg',0.86));
- const blob=makeDirectPDF(images),url=URL.createObjectURL(blob),link=document.createElement('a');
- link.href=url;link.download=`Gigabajt_CMR_Kalendarz_${Y}_${P(M+1)}.pdf`;
- document.body.appendChild(link);link.click();link.remove();
- setTimeout(()=>URL.revokeObjectURL(url),60000);
+ const blob=makeDirectPDF(images);
+ const filename=`Gigabajt_CMR_Kalendarz_${Y}_${P(M+1)}.pdf`;
+ if(window.AndroidCMR && typeof window.AndroidCMR.saveFile==='function'){
+  const reader=new FileReader();
+  reader.onload=()=>{
+   try{
+    const data=String(reader.result||'');
+    const comma=data.indexOf(',');
+    if(comma<0)throw new Error('Brak danych PDF');
+    window.AndroidCMR.saveFile(filename,'application/pdf',data.slice(comma+1));
+   }catch(e){alert('Blad zapisu PDF: '+e.message)}
+  };
+  reader.onerror=()=>alert('Nie udalo sie odczytac PDF');
+  reader.readAsDataURL(blob);
+ }else{
+  const url=URL.createObjectURL(blob),link=document.createElement('a');
+  link.href=url;link.download=filename;
+  document.body.appendChild(link);link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+ }
 }
 function summary(){let a=sums(),values=[String(a.days),human(a.total),human(a.drive),human(a.other)];V.innerHTML=`<button class="nav" id="back">← Kalendarz</button><h3 style="margin:17px 0">Zestawienie — ${mo[M]} ${Y}</h3><div style="display:grid;gap:10px">${categories.map(([id,name],i)=>`<button class="sumcard" data-cat="${id}"><div class="muted" style="font-size:14px">${name}</div><div class="sumvalue">${values[i]}</div><div class="muted" style="margin-top:8px">Dotknij, aby zobaczyć daty ›</div></button>`).join('')}</div><button class="primary" id="pdfDownload" style="margin-top:15px;background:#226cb7">Pobierz raport PDF</button><button class="primary" id="return" style="margin-top:9px">Wróć do kalendarza</button>`;V.querySelector('#back').onclick=calendar;V.querySelector('#return').onclick=calendar;V.querySelector('#pdfDownload').onclick=exportMonthPDF;V.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>detailCat(b.dataset.cat))}
 function detailCat(id){let name=categories.find(x=>x[0]===id)?.[1];if(!name)return summary();let list=monthly().filter(x=>id==='days'||id==='total'?x.span!==null:x[id]!==null),a=sums(),value=id==='days'?String(a.days):human(a[id]);V.innerHTML=`<button class="nav" id="back">← Zestawienie miesiąca</button><h3>${name}</h3><div class="panel" style="text-align:center;margin-bottom:12px"><div class="muted">${mo[M]} ${Y}</div><div class="sumvalue">${value}</div></div><div class="panel" style="padding:3px 10px">${list.length?list.map(x=>`<div class="detailrow"><div><strong>${x.d} ${mo[M].toLowerCase()}</strong>${id==='days'||id==='total'?`<div class="muted">${fmt(x.r.start)}–${fmt(x.r.end)}</div>`:''}</div><b>${id==='days'?'1 dniówka':human(x[id==='total'?'span':id])}</b></div>`).join(''):'<p class="muted">Nie ma jeszcze wpisów.</p>'}</div><button class="primary" id="return" style="margin-top:14px">Wróć do czterech kafelków</button>`;V.querySelector('#back').onclick=summary;V.querySelector('#return').onclick=summary}

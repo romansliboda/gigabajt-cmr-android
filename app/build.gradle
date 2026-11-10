@@ -2,8 +2,24 @@ plugins { id 'com.android.application' }
 android {
  namespace 'pl.gigabajt.cmr'
  compileSdk 35
- defaultConfig { applicationId 'pl.gigabajt.cmr'; minSdk 26; targetSdk 35; versionCode 129; versionName '12.9' }
- buildTypes { release { minifyEnabled false } }
+ defaultConfig { applicationId 'pl.gigabajt.cmr'; minSdk 26; targetSdk 35; versionCode 130; versionName '13.0' }
+ signingConfigs {
+  cmrRelease {
+    storeFile file(System.getenv('CMR_KEYSTORE_FILE') ?: 'missing-cmr-key.p12')
+    storePassword System.getenv('CMR_SIGNING_PASSWORD') ?: ''
+    keyAlias 'gigabajtcmr'
+    keyPassword System.getenv('CMR_SIGNING_PASSWORD') ?: ''
+    storeType 'pkcs12'
+  }
+ }
+ buildTypes {
+  release {
+   minifyEnabled false
+   signingConfig signingConfigs.cmrRelease
+  }
+ }
  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }
 dependencies { implementation 'androidx.webkit:webkit:1.12.1' }
+
+dependencies { implementation 'androidx.core:core:1.13.1' }

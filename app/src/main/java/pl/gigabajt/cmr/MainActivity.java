@@ -84,6 +84,7 @@ public class MainActivity extends Activity {
    }
   });
   web.addJavascriptInterface(new NativeBridge(),"AndroidCMR");
+  web.addJavascriptInterface(new GBUpdaterNative(this,web),"GBUpdater");
   web.setDownloadListener((url,userAgent,disposition,mime,length)->{
    if(url.startsWith("http://")||url.startsWith("https://")){
     try {DownloadManager.Request r=new DownloadManager.Request(Uri.parse(url));r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);

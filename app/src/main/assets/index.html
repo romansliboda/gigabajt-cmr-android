@@ -267,6 +267,34 @@ body.gb-dark .cmr-history-row .archive-card-text strong,body.gb-dark .cmr-histor
 #gbStartSplash .gb-loading-label{font-size:12px;margin-top:9px}
 @keyframes gbShowProgress{to{opacity:1}}@keyframes gbFillProgress{to{width:100%}}
 @media(prefers-reduced-motion:reduce){#gbStartSplash .gb-letter{animation-duration:.1s!important;animation-delay:0s!important}#gbStartSplash .gb-progress-wrap{animation-delay:.1s}#gbStartSplash .gb-progress-fill{animation-delay:.1s;animation-duration:.2s}}
+
+.gbcmr-update-badge.about-version{
+ display:inline-flex;align-items:center;gap:7px;
+ border:0;border-radius:20px;padding:8px 14px;
+ background:#e6ebf1;color:#526174;
+ font:700 12px system-ui,sans-serif;
+ cursor:pointer;transition:background .2s,color .2s
+}
+.gbcmr-update-badge.update-ready{
+ background:#dbeafa;color:#1769c2
+}
+.gbcmr-update-badge:active{transform:translateY(1px)}
+#gbcmr-update-track{
+ max-width:270px;height:9px;background:#e5ebf2;
+ border-radius:20px;overflow:hidden;margin:12px auto 0
+}
+#gbcmr-update-track[hidden]{display:none!important}
+#gbcmr-update-fill{
+ height:100%;width:0%;background:#1769c2;
+ transition:width .15s linear
+}
+#gbcmr-update-status,#gbcmr-update-news{
+ font:12px/1.5 system-ui,sans-serif;color:#64748b;
+ text-align:center;max-width:290px;margin:8px auto
+}
+#gbcmr-update-status:empty,#gbcmr-update-news:empty{
+ display:none
+}
 </style><script>
 /* Android-only: direct blob exports to Downloads without changing browser/PWA behavior. */
 (function(){
@@ -330,7 +358,20 @@ window.addEventListener('message',function(event){
 <div id="settingsNumbering" class="settings-page hidden"><button class="secondary settings-back" onclick="showSettingsPage('home')">← Wróć</button><h3>🔢 Numeracja CMR</h3><p id="numberSettingsInfo" class="hint"></p><button class="secondary" onclick="setNumberingModeFromSettings(true)">Automatycznie</button><button class="secondary" onclick="setNumberingModeFromSettings(false)">Ręcznie</button><button class="danger" onclick="resetCMRNumber();updateNumberingInfo()">Resetuj licznik (od 001)</button><p class="hint">Reset nie usuwa historii dokumentów. Nowy numer będzie widoczny przy tworzeniu nowej CMR.</p></div>
 <div id="settingsPermissions" class="settings-page hidden"><button class="secondary settings-back" onclick="showSettingsPage('home')">← Wróć</button><h3>🔐 Uprawnienia</h3><p class="hint">Przełączniki sterują funkcjami w Gigabajt CMR. Zezwolenie systemowe Androida pojawi się dopiero wtedy, kiedy użyjesz odpowiedniej funkcji. Możesz je też zmienić w ustawieniach telefonu.</p><div class="dt-card"><strong>📷 Aparat i zdjęcia CMR</strong><label class="dt-switchline"><input id="permCamera" type="checkbox" onchange="setAppPermission('camera',this.checked)"><span>Włącz fotografowanie dokumentów</span></label><p class="hint">Zdjęcia trafiają do lokalnego archiwum zdjęć CMR w Historii. Aplikacja nie wysyła ich na serwer.</p></div><div class="dt-card"><strong>📍 Lokalizacja</strong><label class="dt-switchline"><input id="permLocation" type="checkbox" onchange="setAppPermission('location',this.checked)"><span>Włącz pobieranie pozycji GPS na żądanie</span></label><p class="hint">Pozycja jest pobierana tylko po dotknięciu przycisku „Pobierz lokalizację” i pokazuje współrzędne, nie adres. Nie śledzi trasy. Za Twoją zgodą można znaleźć pobliską firmę i zaproponować jej dane do rubryki 1 — Nadawca. Do wyszukiwania firm potrzebny jest internet (OpenStreetMap).</p></div><div class="dt-card"><strong>🔔 Powiadomienia</strong><label class="dt-switchline"><input id="permNotifications" type="checkbox" onchange="setAppPermission('notifications',this.checked)"><span>Zezwól na powiadomienia o zapisaniu zdjęcia</span></label><p id="notificationPermissionStatus" class="hint"></p></div><button class="primary" onclick="closeAppSettings()">Gotowe</button></div>
 <div id="settingsAbout" class="settings-page hidden"><button class="secondary settings-back" onclick="showSettingsPage('home')">← Wróć</button>
-<div class="about-hero"><div class="about-truck" aria-hidden="true">🚛</div><h3>Gigabajt CMR</h3><p>Elektroniczny asystent listów przewozowych</p><span class="about-version">Wersja 13.0</span></div>
+<div class="about-hero"><div class="about-truck" aria-hidden="true">🚛</div><h3>Gigabajt CMR</h3><p>Elektroniczny asystent listów przewozowych</p><button type="button" class="about-version gbcmr-update-badge"
+id="gbcmr-update-badge" onclick="gbCMRUpdateClick()">
+<svg width="17" height="17" viewBox="0 0 24 24"
+fill="none" stroke="currentColor" stroke-width="2.2"
+stroke-linecap="round" stroke-linejoin="round">
+<path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"/>
+<path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/>
+</svg>
+<span id="gbcmr-version-label">Wersja 13.0</span>
+</button>
+<div id="gbcmr-update-track" hidden>
+<div id="gbcmr-update-fill"></div></div>
+<p id="gbcmr-update-status" aria-live="polite"></p>
+<p id="gbcmr-update-news"></p></div>
 <div class="about-details">
 <div class="about-line"><span aria-hidden="true">👤</span><div><strong>Pomysłodawca i twórca projektu</strong><small>Roman Sliboda</small></div></div>
 <div class="about-line"><span aria-hidden="true">🚚</span><div><strong>Przeznaczenie</strong><small>Kierowcy i przewoźnicy międzynarodowi</small></div></div>
@@ -958,4 +999,4 @@ async function findLoadingCompany(){
   });
  };
 })();
-</script></body></html>
+</script><script src="gb-cmr-updater.js"></script></body></html>
